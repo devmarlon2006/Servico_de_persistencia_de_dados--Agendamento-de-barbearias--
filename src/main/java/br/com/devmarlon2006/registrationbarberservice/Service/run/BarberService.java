@@ -1,5 +1,6 @@
 package br.com.devmarlon2006.registrationbarberservice.Service.run;
 
+import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.MesagerComplements;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.MessageContainer;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseMessages;
 import br.com.devmarlon2006.registrationbarberservice.Service.connectionmodule.TestConectivity;
@@ -27,12 +28,14 @@ public class BarberService {
     }
 
 
-    public MessageContainer<?> ProcessBarberRegistration(Barber barber){
-        MessageContainer<String> barberMessageContainer = execute.Container();
+    public MessageContainer<MesagerComplements<?>, String> ProcessBarberRegistration(Barber barber){
+        MessageContainer<MesagerComplements<?> ,String> barberMessageContainer = new MessageContainer<>();
         try{
             test.TestConectionData();
         }catch (ConnectionDestroyed e){
-            barberMessageContainer.addMesage("Fatal Error");
+            barberMessageContainer.addMesage(
+                    barberMessageContainer.newAresponseComplements(
+                            ResponseMessages.ERROR, "Fatal Error"));
             barberMessageContainer.addResponse("Error");
             return barberMessageContainer;
         }
@@ -43,7 +46,9 @@ public class BarberService {
         try{
             if(!(managerBarber.isInstance( barber.getClass() ))){
                 Validation.ClearObject(barber);
-                barberMessageContainer.addMesage("Invalid Object");
+                barberMessageContainer.addMesage(
+                        barberMessageContainer.newAresponseComplements(
+                                ResponseMessages.WARNING, "Barber not found" ));
                 return barberMessageContainer;
             }
 
@@ -67,7 +72,9 @@ public class BarberService {
             for (int INDEX = 0; INDEX < list.size(); INDEX++) {
                 if(list.get( INDEX ) == ResponseMessages.ERROR ) {
                     barberMessageContainer.addResponse("Error");
-                    barberMessageContainer.addMesage(logMessages[INDEX]);
+                    barberMessageContainer.addMesage(
+                            barberMessageContainer.newAresponseComplements(
+                                    ResponseMessages.ERROR, logMessages[INDEX]));
                 }
             }
         }
@@ -75,7 +82,9 @@ public class BarberService {
         for (int INDEX = 0; INDEX < list.size(); INDEX++) {
             if(list.get( INDEX ) == ResponseMessages.SUCCESS ) {
                 barberMessageContainer.addResponse("Success");
-                barberMessageContainer.addMesage(logMessages[INDEX]);
+                barberMessageContainer.addMesage(
+                        barberMessageContainer.newAresponseComplements(
+                        ResponseMessages.SUCCESS, logMessages[INDEX]));
             }
         }
         return barberMessageContainer; //Log de operações!! não recomendado para voltar para o usuario, apenas para testes e registro de Log.

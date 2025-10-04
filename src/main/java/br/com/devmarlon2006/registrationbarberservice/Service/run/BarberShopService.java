@@ -1,6 +1,7 @@
 package br.com.devmarlon2006.registrationbarberservice.Service.run;
 
 import br.com.devmarlon2006.registrationbarberservice.Repository.BarberRepository;
+import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.MesagerComplements;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.MessageContainer;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseMessages;
 import br.com.devmarlon2006.registrationbarberservice.Service.manager.repositorymanager.BarberRepositoryManagerService;
@@ -33,26 +34,28 @@ public class BarberShopService {
     }
 
 
-    public MessageContainer<?> processBarberShopRegistration(BarberShop barberShopRecord, String barberID){
-        MessageContainer<String> barberShopMessageContainer = new MessageContainer<>();
+    public MessageContainer<MesagerComplements<?>, String> processBarberShopRegistration(BarberShop barberShopRecord, String barberID){
+        MessageContainer<MesagerComplements<?>, String> barberShopMessageContainer = new MessageContainer<>();
         boolean exists = barberRepository.existsById( barberID); //Busca BArber no banco de dados para verificar se existe
 
         if (exists) {
             barberShopRecord.setOwnerId( barberRepositoryManagerService.fyndBarber( barberID ));
         }else {
-            barberShopMessageContainer.addMesage("Barber not found");
+            barberShopMessageContainer.addMesage(
+                    barberShopMessageContainer.newAresponseComplements( ResponseMessages.WARNING,
+                            "Barber not found" ));
             barberShopMessageContainer.addResponse("Error");
             return barberShopMessageContainer;
         }
 
         try{
-            ResponseMessages saveResponse = barberShopRepositoryManager.postOnRepository(barberShopRecord);
-            if (saveResponse.equals(ResponseMessages.SUCCESS))
+            MesagerComplements<?> saveResponse = barberShopRepositoryManager.postOnRepository(barberShopRecord);
+            if (saveResponse.getCause().equals(ResponseMessages.SUCCESS))
             {
-                barberShopMessageContainer.addMesage("BarberShop registered successfully");
+                barberShopMessageContainer.addMesage(saveResponse);
             }
         }catch (NullPointerException e){
-            barberShopMessageContainer.addMesage("Erro interno");
+            barberShopMessageContainer.addMesage(barberShopMessageContainer.newAresponseComplements(ResponseMessages.ERROR, "Fatal Error"));
             barberShopMessageContainer.addResponse("Error");
             return barberShopMessageContainer;
         }

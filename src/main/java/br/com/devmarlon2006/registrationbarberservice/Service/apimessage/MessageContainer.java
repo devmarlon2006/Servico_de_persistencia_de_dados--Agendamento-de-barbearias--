@@ -20,7 +20,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class MessageContainer<T> {
+public class MessageContainer<T, S> {
     private final Timestamp Data_Da_Operacao = Timestamp.from( Instant.now());
     private String reponse;
     private List<T> ResponseComplements; // Codigo ou mensagem de erro
@@ -53,5 +53,9 @@ public class MessageContainer<T> {
         if (this.ResponseComplements != null) {
             this.ResponseComplements.clear();
         }
+    }
+
+    public MesagerComplements<S> newAresponseComplements(ResponseMessages responseMessages, S message){
+        return new MesagerComplements<>(responseMessages, message);
     }
 }

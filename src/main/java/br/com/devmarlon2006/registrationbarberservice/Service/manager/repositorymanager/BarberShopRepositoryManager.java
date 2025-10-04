@@ -1,6 +1,7 @@
 package br.com.devmarlon2006.registrationbarberservice.Service.manager.repositorymanager;
 
 import br.com.devmarlon2006.registrationbarberservice.Repository.BarberShopRepository;
+import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.MesagerComplements;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseMessages;
 import br.com.devmarlon2006.registrationbarberservice.Service.connectionmodule.TestConectivity;
 import br.com.devmarlon2006.registrationbarberservice.Service.manager.SuperRepositoryManager;
@@ -11,9 +12,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-
+//implements SuperRepositoryManager<BarberShop, String>
 @Service
-public class BarberShopRepositoryManager implements SuperRepositoryManager<BarberShop, String> {
+public class BarberShopRepositoryManager  {
 
     //Repositorys
     private final BarberShopRepository barberShopRepository;
@@ -26,29 +27,36 @@ public class BarberShopRepositoryManager implements SuperRepositoryManager<Barbe
         this.testConectivity = testConectivity;
     }
 
-    @Override
-    public ResponseMessages postOnRepository(BarberShop barberShopRecord){
+    //@Override
+    public MesagerComplements<?> postOnRepository(BarberShop barberShopRecord){
+
+        MesagerComplements<String> message = new MesagerComplements<>();
 
         try{
 
             if (repositoryGET( barberShopRecord, TypeOfReturn.NEGATIVE ).equals( ResponseMessages.WARNING )){
 
-                return ResponseMessages.ERROR;
-
+                message.setCause( ResponseMessages.ERROR );
+                message.setMessage("Erro interno");
+                return message;
             }
 
         }catch (NullPointerException e){
-            return ResponseMessages.ERROR;
+            message.setMessage("Erro inesperado");
+            message.setMessage( "Erro interno ao tentar persistir o registro" );
+            return message;
         }
 
         if (barberShopRecord.getId() != null || barberShopRecord.getOwnerId() != null){
             barberShopRepository.save(barberShopRecord);
+            message.setMessage("Registro persistido com sucesso");
+            message.setCause(ResponseMessages.SUCCESS);
         }
 
-        return testConectivity.retrieveError();
+        return message;
     }
 
-    @Override
+    //@Override
     public ResponseMessages repositoryGET(BarberShop barberShop, TypeOfReturn type){
 
        if (barberShopRepository.existsById( barberShop.getId() )
@@ -64,12 +72,12 @@ public class BarberShopRepositoryManager implements SuperRepositoryManager<Barbe
     }
 
 
-    @Override
+    //@Override
     public boolean isInstance(Class<?> obj){
         return obj.isAssignableFrom(BarberShop.class);
     }
 
-    @Override
+    //@Override
     public boolean validateAtribiutesFormat(BarberShop barberShop){
         return true;
     }

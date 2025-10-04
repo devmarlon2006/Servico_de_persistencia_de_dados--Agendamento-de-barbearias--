@@ -30,7 +30,7 @@ public class BarberShopController {
             return ResponseEntity.status( 400 ).body( new MessageContainer<>(e.getMessage()));
         }
 
-        MessageContainer<?> message = barberShopService.processBarberShopRegistration( barberShopRecord, barberShopRecord.getOwerID());
+        MessageContainer<?, ?> message = barberShopService.processBarberShopRegistration( barberShopRecord, barberShopRecord.getOwerID());
         return ResponseEntity.status( 200 ).body( message );
     }
 }

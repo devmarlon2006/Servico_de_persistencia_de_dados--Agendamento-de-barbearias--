@@ -1,5 +1,6 @@
 package br.com.devmarlon2006.registrationbarberservice.Service.run;
 
+import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.MesagerComplements;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.MessageContainer;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseMessages;
 import br.com.devmarlon2006.registrationbarberservice.Service.connectionmodule.TestConectivity;
@@ -49,13 +50,15 @@ public class ClientService {
      * @param client objeto Client a ser validado e persistido
      * @return MessageContainer contendo mensagens de sucesso, aviso e/ou erro sobre a operação executada
      */
-    public MessageContainer<?> ProcessClientRegistration(@NonNull Client client) {
-        MessageContainer<String> clientMessageContainer = execute.Container();
+    public MessageContainer<MesagerComplements<?>, String> ProcessClientRegistration(@NonNull Client client) {
+        MessageContainer<MesagerComplements<?>, String> clientMessageContainer = new MessageContainer<>();
 
         try{
             test.TestConectionData();
         }catch (ConnectionDestroyed e){
-            clientMessageContainer.addMesage("Fatal Error");
+            clientMessageContainer.addMesage(
+                    clientMessageContainer.newAresponseComplements(
+                            ResponseMessages.ERROR, "Fatal Error"));
             clientMessageContainer.addResponse("Error");
             return clientMessageContainer;
         }
@@ -67,7 +70,9 @@ public class ClientService {
         try{
             if(!(managerClient.isInstance( client.getClass() ))){
                 Validation.ClearObject(client);
-                clientMessageContainer.addMesage("Invalid Object");
+                clientMessageContainer.addMesage(
+                        clientMessageContainer.newAresponseComplements(
+                                ResponseMessages.WARNING, "Invalid Object"));
                 return clientMessageContainer;
             }
 
@@ -87,7 +92,9 @@ public class ClientService {
             for (int INDEX = 0; INDEX < list.size(); INDEX++) {
                 if(list.get( INDEX ) == ResponseMessages.ERROR ) {
                     clientMessageContainer.addResponse("Error");
-                    clientMessageContainer.addMesage(logMessages[INDEX]);
+                    clientMessageContainer.addMesage(
+                            clientMessageContainer.newAresponseComplements(
+                                    ResponseMessages.ERROR, logMessages[INDEX]));
                 }
             }
             return clientMessageContainer;
@@ -97,10 +104,14 @@ public class ClientService {
             if(list.get( INDEX ) == ResponseMessages.SUCCESS ) {
 
                 clientMessageContainer.addResponse("Success");
-                clientMessageContainer.addMesage(logMessages[INDEX]);
+                clientMessageContainer.addMesage(
+                        clientMessageContainer.newAresponseComplements(
+                                ResponseMessages.SUCCESS, logMessages[INDEX]));
 
             } else if(list.get( INDEX ) == ResponseMessages.WARNING ) {
-                clientMessageContainer.addMesage(logMessages[INDEX]);
+                clientMessageContainer.addMesage(
+                        clientMessageContainer.newAresponseComplements(
+                                ResponseMessages.WARNING, logMessages[INDEX]));
             }
         }
         return clientMessageContainer; //Log de operações!! não recomendado para voltar para o usuario, apenas para testes e registro de Log.

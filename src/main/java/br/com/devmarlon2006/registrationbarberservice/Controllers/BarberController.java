@@ -44,7 +44,7 @@ public class BarberController {
         }
 
 
-        MessageContainer<?> a = barberService.ProcessBarberRegistration( barber );
+        MessageContainer<?,?> a = barberService.ProcessBarberRegistration( barber );
 
         if (a.getReponse().equals("error")){
 

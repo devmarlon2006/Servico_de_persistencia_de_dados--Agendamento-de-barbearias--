@@ -25,9 +25,6 @@ public class Execute {
         return "SALVAR ENTIDADE " + (clazz.getClass()).getName() +" DE ID:" + identifier + " * STATUS:" + status;
     }
 
-    public MessageContainer<String> Container(){
-        return new MessageContainer<>();
-    }
 
     public List<ResponseMessages> ListResponseMessages(){
         return new ArrayList<>();

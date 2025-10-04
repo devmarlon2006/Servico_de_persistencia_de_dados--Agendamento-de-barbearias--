@@ -77,7 +77,7 @@ public class ClientController {
             return ResponseEntity.status( 503 ).body( HttpStatus.SERVICE_UNAVAILABLE );
         }
 
-        MessageContainer<?> a =  executeClient.ProcessClientRegistration( client );
+        MessageContainer<?,?> a =  executeClient.ProcessClientRegistration( client );
 
         if (a.getReponse().equals("error")){
             return ResponseEntity.status( 400 ).body( "Error" );
