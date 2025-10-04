@@ -11,12 +11,15 @@
 package br.com.devmarlon2006.registrationbarberservice.Service.manager;
 
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseMessages;
+import br.com.devmarlon2006.registrationbarberservice.Service.manager.repositorymanager.TypeOfReturn;
 
-public interface SuperManager<S, T> {
-    ResponseMessages PostOnRepository(S s);
+public interface SuperRepositoryManager<S, T> {
+    ResponseMessages postOnRepository(S s);
 
-    ResponseMessages RepositoryGET(S s);
+    ResponseMessages repositoryGET(S s, TypeOfReturn t);
 
-    boolean IsInstance(Class<?> t);
+    boolean isInstance(Class<?> t);
+
+    boolean  validateAtribiutesFormat(S s);
 
 }

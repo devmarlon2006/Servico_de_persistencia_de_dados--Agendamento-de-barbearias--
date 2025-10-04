@@ -8,10 +8,10 @@
  * Agradeço sua compreensão.
  */
 
-package br.com.devmarlon2006.registrationbarberservice.Service.manager;
+package br.com.devmarlon2006.registrationbarberservice.Service.connectionmodule;
 
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseMessages;
-import br.com.devmarlon2006.registrationbarberservice.Service.myexeptions.ConnectionDestroyed;
+import br.com.devmarlon2006.registrationbarberservice.Service.systemexeptions.ConnectionDestroyed;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;

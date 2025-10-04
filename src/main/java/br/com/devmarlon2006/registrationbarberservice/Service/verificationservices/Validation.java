@@ -8,9 +8,9 @@
  * Agradeço sua compreensão.
  */
 
-package br.com.devmarlon2006.registrationbarberservice.Service.manager;
+package br.com.devmarlon2006.registrationbarberservice.Service.verificationservices;
 
-public class Validation <T> {
+public class Validation {
 
     public static boolean MatchCharacter(String value){
         return value.matches("\\d+");

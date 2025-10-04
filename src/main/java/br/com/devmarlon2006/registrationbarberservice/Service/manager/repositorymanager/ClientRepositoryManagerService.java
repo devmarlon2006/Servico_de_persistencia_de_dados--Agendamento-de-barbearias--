@@ -8,21 +8,23 @@
  * Agradeço sua compreensão.
  */
 
-package br.com.devmarlon2006.registrationbarberservice.Service.manager;
+package br.com.devmarlon2006.registrationbarberservice.Service.manager.repositorymanager;
 
 
 
 import br.com.devmarlon2006.registrationbarberservice.Repository.ClientRepository;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseMessages;
-import br.com.devmarlon2006.registrationbarberservice.Service.model.Barber;
+import br.com.devmarlon2006.registrationbarberservice.Service.connectionmodule.TestConectivity;
+import br.com.devmarlon2006.registrationbarberservice.Service.manager.SuperRepositoryManager;
 import br.com.devmarlon2006.registrationbarberservice.Service.model.Client;
+import br.com.devmarlon2006.registrationbarberservice.Service.verificationservices.Validation;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class ClientRepositoryManagerService implements SuperManager<Client, String> {
+public class ClientRepositoryManagerService implements SuperRepositoryManager<Client, String> {
 
     private final ClientRepository clientRepository;
     private final TestConectivity testConectivity;
@@ -38,10 +40,10 @@ public class ClientRepositoryManagerService implements SuperManager<Client, Stri
      *
      * Regras de negócio:
      * - Se o registro for nulo, é considerado inexistente e o fluxo retorna {@code ERROR}.
-     * - Antes de salvar, verifica conflitos com {@link #RepositoryGET(Client)}:
+     * - Antes de salvar, verifica conflitos com {@link #repositoryGET(Client)}:
      *   - Se houver conflito (cliente já existente por id/email/username), retorna {@code ERROR}.
-     * - Se os atributos tiverem formato válido ({@link #ClientValidateAtribiutesFormat(Client)}) e o objeto for
-     *   reconhecido como instância de {@link Client} ({@link #IsInstance(Class)}), o registro é salvo.
+     * - Se os atributos tiverem formato válido ({@link #validateAtribiutesFormat(Client)}) e o objeto for
+     *   reconhecido como instância de {@link Client} ({@link #isInstance(Class)}), o registro é salvo.
      *   Caso contrário, o objeto é "limpo" via {@link Validation#ClearObject(Object)} (sem efeito colateral externo) e segue com SUCCESS.
      *
      * Observações:
@@ -56,15 +58,15 @@ public class ClientRepositoryManagerService implements SuperManager<Client, Stri
      *         objeto nulo, conflito detectado ou exceção esperada no fluxo de validação.
      */
     @Override
-    public ResponseMessages PostOnRepository(Client ClientRecord) {
+    public ResponseMessages postOnRepository(Client ClientRecord) {
         try {
-            if (RepositoryGET( ClientRecord ).equals( ResponseMessages.ERROR )){
+            if (repositoryGET( ClientRecord , TypeOfReturn.NEGATIVE ).equals( ResponseMessages.ERROR )){
                 return ResponseMessages.ERROR;
             }
         } catch (NullPointerException e) {
             return ResponseMessages.ERROR;
         }
-        if(ClientValidateAtribiutesFormat( ClientRecord )) {
+        if(validateAtribiutesFormat( ClientRecord )) {
             clientRepository.save( ClientRecord );
         }else{
             Validation.ClearObject(ClientRecord);
@@ -86,11 +88,14 @@ public class ClientRepositoryManagerService implements SuperManager<Client, Stri
      * @return {@link ResponseMessages#ERROR} se já existir; {@link ResponseMessages#SUCCESS} caso contrário
      */
     @Override
-    public ResponseMessages RepositoryGET(Client ClientRecord) {
+    public ResponseMessages repositoryGET(Client ClientRecord, TypeOfReturn typeOfReturn) {
         if (clientRepository.existsById( ClientRecord.getId() ) || clientRepository.existsByEmail( ClientRecord.getEmail()) ||
                 clientRepository.existsByUsername( ClientRecord.getUsername() ))
         {
-            return testConectivity.retrieveError();
+            return switch (typeOfReturn) {
+                case NEGATIVE -> ResponseMessages.ERROR;
+                case POSITIVE -> ResponseMessages.SUCCESS;
+            };
         }
         return testConectivity.retrieveSuccess();
     }
@@ -106,7 +111,7 @@ public class ClientRepositoryManagerService implements SuperManager<Client, Stri
      * @param client cliente a ser validado
      * @return true se todos os atributos passarem nas validações; false caso contrário
      */
-    public boolean ClientValidateAtribiutesFormat(Client client) {
+    public boolean validateAtribiutesFormat(Client client) {
         List<Boolean> list = new ArrayList<>();
 
         list.add( Validation.NameIsCorrect( client.getName() ) || Validation.MatchCharacter( client.getName() ) );
@@ -125,7 +130,7 @@ public class ClientRepositoryManagerService implements SuperManager<Client, Stri
      */
 
     @Override
-    public boolean IsInstance(Class<?> obj){
-        return obj.isAssignableFrom( Barber.class);
+    public boolean isInstance(Class<?> obj){
+        return obj.isAssignableFrom( Client.class);
     }
 }

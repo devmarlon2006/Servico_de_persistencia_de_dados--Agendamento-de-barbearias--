@@ -11,10 +11,14 @@
 package br.com.devmarlon2006.registrationbarberservice.Controllers;
 
 
-import br.com.devmarlon2006.registrationbarberservice.Service.manager.BarberRepositoryManagerService;
+import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.MessageContainer;
+import br.com.devmarlon2006.registrationbarberservice.Service.connectionmodule.TestConectivity;
 import br.com.devmarlon2006.registrationbarberservice.Service.model.Barber;
+import br.com.devmarlon2006.registrationbarberservice.Service.run.BarberService;
+import br.com.devmarlon2006.registrationbarberservice.Service.systemexeptions.ConnectionDestroyed;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,15 +26,32 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("DataSave")
 public class BarberController {
 
-    private final BarberRepositoryManagerService BarberSave;
-    public BarberController(BarberRepositoryManagerService BarberSave) {
-        this.BarberSave = BarberSave;
+    private final TestConectivity testConectivity;
+    private final BarberService barberService;
+
+    public BarberController(TestConectivity testConectivity, BarberService barberService) {
+        this.testConectivity = testConectivity;
+        this.barberService = barberService;
     }
 
     @PostMapping("/Barber")
-    public ResponseEntity<?> SavBarber(Barber barber){
-        BarberSave.PostOnRepository( barber );
-        return ResponseEntity.status( 200 ).body( "saved" );
-    }
+    public ResponseEntity<?> SavBarber(@RequestBody Barber barber){
 
+        try{
+            testConectivity.TestConectionData();
+        }catch (ConnectionDestroyed e){
+            return ResponseEntity.status( 400 ).body( "Error" );
+        }
+
+
+        MessageContainer<?> a = barberService.ProcessBarberRegistration( barber );
+
+        if (a.getReponse().equals("error")){
+
+            return ResponseEntity.status( 400 ).body( "Error" );
+
+        }
+
+        return ResponseEntity.status( 200 ).body( "Ok" );
+    }
 }
