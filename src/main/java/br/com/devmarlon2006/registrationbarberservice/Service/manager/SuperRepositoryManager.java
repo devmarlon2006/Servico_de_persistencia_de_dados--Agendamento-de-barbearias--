@@ -10,11 +10,12 @@
 
 package br.com.devmarlon2006.registrationbarberservice.Service.manager;
 
+import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.MesagerComplements;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseMessages;
 import br.com.devmarlon2006.registrationbarberservice.Service.manager.repositorymanager.TypeOfReturn;
 
 public interface SuperRepositoryManager<S, T> {
-    ResponseMessages postOnRepository(S s);
+    MesagerComplements<?> postOnRepository(S s);
 
     ResponseMessages repositoryGET(S s, TypeOfReturn t);
 

@@ -8,6 +8,6 @@ import lombok.Setter;
 @Getter @Setter
 @AllArgsConstructor @NoArgsConstructor
 public class MesagerComplements<T> {
-    private ResponseMessages cause;
+    private ResponseMessages status;
     private T message;
 }

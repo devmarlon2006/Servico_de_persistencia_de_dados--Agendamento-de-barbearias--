@@ -6,15 +6,17 @@ import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.Respons
 import br.com.devmarlon2006.registrationbarberservice.Service.connectionmodule.TestConectivity;
 import br.com.devmarlon2006.registrationbarberservice.Service.manager.SuperRepositoryManager;
 import br.com.devmarlon2006.registrationbarberservice.Service.model.BarberShop;
+import br.com.devmarlon2006.registrationbarberservice.Service.systemexeptions.ConnectionDestroyed;
+import br.com.devmarlon2006.registrationbarberservice.Service.verificationservices.Validation;
 import org.springframework.stereotype.Service;
 
+import javax.sql.DataSource;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-//implements SuperRepositoryManager<BarberShop, String>
+//
 @Service
-public class BarberShopRepositoryManager  {
+public class BarberShopRepositoryManager implements SuperRepositoryManager<BarberShop, String> {
 
     //Repositorys
     private final BarberShopRepository barberShopRepository;
@@ -22,41 +24,51 @@ public class BarberShopRepositoryManager  {
     private final TestConectivity testConectivity;
 
 
-    public BarberShopRepositoryManager(BarberShopRepository barberShopRepository, TestConectivity testConectivity) {
+    public BarberShopRepositoryManager(BarberShopRepository barberShopRepository, TestConectivity testConectivity, DataSource dataSource) {
         this.barberShopRepository = barberShopRepository;
         this.testConectivity = testConectivity;
     }
 
-    //@Override
-    public MesagerComplements<?> postOnRepository(BarberShop barberShopRecord){
+    @Override
+    public MesagerComplements<String> postOnRepository(BarberShop barberShopRecord){
 
         MesagerComplements<String> message = new MesagerComplements<>();
 
         try{
 
-            if (repositoryGET( barberShopRecord, TypeOfReturn.NEGATIVE ).equals( ResponseMessages.WARNING )){
+            if (repositoryGET( barberShopRecord, TypeOfReturn.NEGATIVE ) == ResponseMessages.WARNING) {
 
-                message.setCause( ResponseMessages.ERROR );
-                message.setMessage("Erro interno");
+                message.setStatus( ResponseMessages.ERROR );
+                message.setMessage("Erro interno - ID erro: bs10");
                 return message;
             }
 
         }catch (NullPointerException e){
-            message.setMessage("Erro inesperado");
-            message.setMessage( "Erro interno ao tentar persistir o registro" );
+            message.setMessage( "Erro inesperado - ID Erro: bs11" );
             return message;
         }
 
         if (barberShopRecord.getId() != null || barberShopRecord.getOwnerId() != null){
-            barberShopRepository.save(barberShopRecord);
-            message.setMessage("Registro persistido com sucesso");
-            message.setCause(ResponseMessages.SUCCESS);
+
+            try{
+
+                barberShopRepository.save(barberShopRecord);
+
+                message.setMessage("Registro persistido com sucesso");
+                message.setStatus(ResponseMessages.SUCCESS);
+
+            } catch (NullPointerException e) {
+                message.setMessage("Erro interno - ID Erro: bs12");
+                message.setStatus(ResponseMessages.ERROR);
+               return message;
+            }
+
         }
 
         return message;
     }
 
-    //@Override
+    @Override
     public ResponseMessages repositoryGET(BarberShop barberShop, TypeOfReturn type){
 
        if (barberShopRepository.existsById( barberShop.getId() )
@@ -72,13 +84,19 @@ public class BarberShopRepositoryManager  {
     }
 
 
-    //@Override
+    @Override
     public boolean isInstance(Class<?> obj){
         return obj.isAssignableFrom(BarberShop.class);
     }
 
-    //@Override
+    @Override
     public boolean validateAtribiutesFormat(BarberShop barberShop){
-        return true;
+        List<Boolean> list = new ArrayList<>();
+
+        list.add( Validation.NameIsCorrect( barberShop.getName() ) );
+        list.add( Validation.MatchCharacter( barberShop.getId() ) );
+        list.add( Validation.PhoneIsCorrect( barberShop.getPhone() ) );
+
+        return list.stream().allMatch( Boolean::booleanValue );
     }
 }

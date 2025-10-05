@@ -11,6 +11,7 @@
 package br.com.devmarlon2006.registrationbarberservice.Service.manager.repositorymanager;
 
 import br.com.devmarlon2006.registrationbarberservice.Repository.BarberRepository;
+import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.MesagerComplements;
 import br.com.devmarlon2006.registrationbarberservice.Service.connectionmodule.TestConectivity;
 import br.com.devmarlon2006.registrationbarberservice.Service.manager.SuperRepositoryManager;
 import br.com.devmarlon2006.registrationbarberservice.Service.model.Barber;
@@ -34,35 +35,47 @@ public class BarberRepositoryManagerService implements SuperRepositoryManager<Ba
     }
 
     @Override
-    public ResponseMessages postOnRepository(Barber barberRecord) {
+    public MesagerComplements<String> postOnRepository(Barber barberRecord) {
+
+        MesagerComplements<String> message = new MesagerComplements<>();
 
         try{
-            if (repositoryGET( barberRecord, TypeOfReturn.NEGATIVE ).equals( ResponseMessages.ERROR )){
-               return ResponseMessages.ERROR;
+            if (repositoryGET( barberRecord, TypeOfReturn.NEGATIVE ) == ResponseMessages.WARNING){
+               message.setStatus( ResponseMessages.ERROR );
+               message.setMessage("Erro interno ");
+               return message;
             }
         }catch (NullPointerException e){
-            return ResponseMessages.ERROR;
-        }
-
-        if ( phoneVerify(barberRecord.getPhone())){
-            return ResponseMessages.ERROR;
+            message.setMessage("Erro inesperado");
+            message.setMessage( "Erro interno ao tentar buscar o registro" );
+            return message;
         }
 
         if(validateAtribiutesFormat( barberRecord )){
-            barberRecord.DeafullScore(); // Se o score for nulo ou maior que 0 ele e setado como 0.
-            barberRepository.save(barberRecord);
+
+            try{
+                barberRepository.save(barberRecord);
+                message.setMessage("Registro persistido com sucesso");
+            }catch (NullPointerException e){
+                message.setMessage("Erro interno ao tentar persistir o registro - ID erro: ba11");
+                message.setStatus(ResponseMessages.ERROR);
+               return message;
+            }
+            message.setStatus(ResponseMessages.SUCCESS);
         }else {
             Validation.ClearObject(barberRecord);
-            return ResponseMessages.ERROR;
+            message.setMessage("Erro interno ao tentar persistir o registro - ID erro: ba12");
+            message.setStatus(ResponseMessages.ERROR);
+            return message ;
         }
-        return ResponseMessages.SUCCESS ;
+        return message ;
     }
 
     @Override
     public ResponseMessages repositoryGET(Barber barber, TypeOfReturn typeOfReturn){
         if( barberRepository.existsById(barber.getId()) || barberRepository.existsByEmail(barber.getEmail()))
         {
-            return testConectivity.retrieveError();
+            return testConectivity.retrieveWarning();
         }
        return ResponseMessages.SUCCESS;
     }

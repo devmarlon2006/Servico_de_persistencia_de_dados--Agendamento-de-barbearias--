@@ -13,6 +13,7 @@ package br.com.devmarlon2006.registrationbarberservice.Service.manager.repositor
 
 
 import br.com.devmarlon2006.registrationbarberservice.Repository.ClientRepository;
+import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.MesagerComplements;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseMessages;
 import br.com.devmarlon2006.registrationbarberservice.Service.connectionmodule.TestConectivity;
 import br.com.devmarlon2006.registrationbarberservice.Service.manager.SuperRepositoryManager;
@@ -40,7 +41,7 @@ public class ClientRepositoryManagerService implements SuperRepositoryManager<Cl
      *
      * Regras de negócio:
      * - Se o registro for nulo, é considerado inexistente e o fluxo retorna {@code ERROR}.
-     * - Antes de salvar, verifica conflitos com {@link #repositoryGET(Client)}:
+     * - Antes de salvar, verifica conflitos com {@link #repositoryGET(Client, TypeOfReturn)}:
      *   - Se houver conflito (cliente já existente por id/email/username), retorna {@code ERROR}.
      * - Se os atributos tiverem formato válido ({@link #validateAtribiutesFormat(Client)}) e o objeto for
      *   reconhecido como instância de {@link Client} ({@link #isInstance(Class)}), o registro é salvo.
@@ -58,20 +59,35 @@ public class ClientRepositoryManagerService implements SuperRepositoryManager<Cl
      *         objeto nulo, conflito detectado ou exceção esperada no fluxo de validação.
      */
     @Override
-    public ResponseMessages postOnRepository(Client ClientRecord) {
+    public MesagerComplements<String> postOnRepository(Client ClientRecord) {
+        MesagerComplements<String> message = new MesagerComplements<>();
+
         try {
-            if (repositoryGET( ClientRecord , TypeOfReturn.NEGATIVE ).equals( ResponseMessages.ERROR )){
-                return ResponseMessages.ERROR;
+            if (repositoryGET( ClientRecord , TypeOfReturn.NEGATIVE ).equals( ResponseMessages.WARNING )) {
+                message.setStatus( ResponseMessages.ERROR );
+                message.setMessage("Erro interno - ID erro: cl10");
+                return message;
             }
         } catch (NullPointerException e) {
-            return ResponseMessages.ERROR;
+            message.setStatus( ResponseMessages.ERROR );
+            message.setMessage("Erro interno - ID Erro: cl11");
+            return message;
         }
+
         if(validateAtribiutesFormat( ClientRecord )) {
+
             clientRepository.save( ClientRecord );
-        }else{
-            Validation.ClearObject(ClientRecord);
+            message.setStatus( ResponseMessages.SUCCESS );
+            message.setMessage("Registro persistido com sucesso - ID Success: cl12");
+
+        }else {
+            Validation.ClearObject( ClientRecord );
+            message.setStatus( ResponseMessages.ERROR );
+            message.setMessage("Erro interno ao tentar persistir o registro - ID erro: cl13");
+            return message;
         }
-        return ResponseMessages.SUCCESS;
+
+        return message;
     }
 
     /**
@@ -90,14 +106,14 @@ public class ClientRepositoryManagerService implements SuperRepositoryManager<Cl
     @Override
     public ResponseMessages repositoryGET(Client ClientRecord, TypeOfReturn typeOfReturn) {
         if (clientRepository.existsById( ClientRecord.getId() ) || clientRepository.existsByEmail( ClientRecord.getEmail()) ||
-                clientRepository.existsByUsername( ClientRecord.getUsername() ))
-        {
-            return switch (typeOfReturn) {
-                case NEGATIVE -> ResponseMessages.ERROR;
+                clientRepository.existsByUsername( ClientRecord.getUsername() )) {
+
+            return switch (typeOfReturn){
                 case POSITIVE -> ResponseMessages.SUCCESS;
+                case NEGATIVE -> ResponseMessages.WARNING;
             };
         }
-        return testConectivity.retrieveSuccess();
+        return testConectivity.retrieveInfo(); //Deafull message
     }
 
 

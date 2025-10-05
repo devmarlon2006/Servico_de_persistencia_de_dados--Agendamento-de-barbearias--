@@ -10,8 +10,7 @@ import br.com.devmarlon2006.registrationbarberservice.Service.systemexeptions.Co
 import br.com.devmarlon2006.registrationbarberservice.Service.verificationservices.Validation;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
-import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -27,67 +26,77 @@ public class BarberService {
         this.test = test;
     }
 
-
+    /**
+     * Processa o registro de um barbeiro no sistema.
+     * 
+     * Fluxo de operação:
+     * 1. Verifica conectividade com o banco de dados
+     * 2. Valida se a instância é do tipo Barber
+     * 3. Persiste o barbeiro no repositório
+     * 4. Registra logs de operação (sucesso/erro)
+     * 5. Constrói e retorna container com mensagens de resposta
+     * 
+     * @param barber Entidade Barber a ser registrada
+     * @return MessageContainer contendo status da operação e mensagens de log
+     */
     public MessageContainer<MesagerComplements<?>, String> ProcessBarberRegistration(Barber barber){
         MessageContainer<MesagerComplements<?> ,String> barberMessageContainer = new MessageContainer<>();
+        List<ResponseMessages> list = new ArrayList<>();
+        
+        // Teste de conectividade - operação crítica que bloqueia o fluxo em caso de falha
         try{
+
             test.TestConectionData();
+            barberMessageContainer.addResponse("Success");
+            barberMessageContainer.addMesage( barberMessageContainer.newAresponseComplements(
+                    ResponseMessages.SUCCESS, "Success" ), 0 );
+
         }catch (ConnectionDestroyed e){
+
             barberMessageContainer.addMesage(
                     barberMessageContainer.newAresponseComplements(
-                            ResponseMessages.ERROR, "Fatal Error"));
+                            ResponseMessages.ERROR, "Banco indisponivel"), 0);
+
             barberMessageContainer.addResponse("Error");
             return barberMessageContainer;
+
         }
 
-        List<ResponseMessages> list = execute.ListResponseMessages();
-
-        String[] logMessages = execute.ArrayLogMessages(4);
         try{
+            // Validação de tipo - garante que a entidade seja uma instância válida de Barber
             if(!(managerBarber.isInstance( barber.getClass() ))){
                 Validation.ClearObject(barber);
+
                 barberMessageContainer.addMesage(
                         barberMessageContainer.newAresponseComplements(
-                                ResponseMessages.WARNING, "Barber not found" ));
+                                ResponseMessages.WARNING, "Objeto invalido"), 0);
+
                 return barberMessageContainer;
             }
 
-            ResponseMessages operationResult = managerBarber.postOnRepository(barber);
-
-            if(operationResult.equals(ResponseMessages.SUCCESS)){
-                barber.DeafullScore();
-                list.add( operationResult );
-                logMessages[0] = execute.FormatLog( barber.getId(), ResponseMessages.SUCCESS, barber.getClass() );
-            }else if(operationResult.equals( ResponseMessages.ERROR )) {
-                list.add( operationResult );
-                logMessages[0] = execute.FormatLog( barber.getId(), ResponseMessages.ERROR , barber.getClass() );
-            }
+            barber.DeafullScore();
+            MesagerComplements<?> operationResult = managerBarber.postOnRepository(barber);
+            barberMessageContainer.addMesage(operationResult, 1);
 
         }catch (NullPointerException e) {
-            list.add( ResponseMessages.ERROR );
-            logMessages[0] = "ERRO NO REPOSITORIO AS:" + Timestamp.from( Instant.now() );
+
+            barberMessageContainer.addMesage(
+                    barberMessageContainer.newAresponseComplements(
+                            ResponseMessages.ERROR, "Fatal Error"), 0);
+
         }
 
-        if(list.contains(ResponseMessages.ERROR)){
-            for (int INDEX = 0; INDEX < list.size(); INDEX++) {
-                if(list.get( INDEX ) == ResponseMessages.ERROR ) {
-                    barberMessageContainer.addResponse("Error");
-                    barberMessageContainer.addMesage(
-                            barberMessageContainer.newAresponseComplements(
-                                    ResponseMessages.ERROR, logMessages[INDEX]));
-                }
-            }
+        for (int INDEX = 0; INDEX <= barberMessageContainer.getResponseComplements().size(); INDEX++){
+            list.add(barberMessageContainer.getResponseComplements().get( INDEX ).getStatus());
         }
 
-        for (int INDEX = 0; INDEX < list.size(); INDEX++) {
-            if(list.get( INDEX ) == ResponseMessages.SUCCESS ) {
-                barberMessageContainer.addResponse("Success");
-                barberMessageContainer.addMesage(
-                        barberMessageContainer.newAresponseComplements(
-                        ResponseMessages.SUCCESS, logMessages[INDEX]));
-            }
+        if (list.stream().allMatch( ResponseMessages.SUCCESS::equals )){
+            barberMessageContainer.setReponse("Success");
+        }else {
+            barberMessageContainer.setReponse("Error");
         }
-        return barberMessageContainer; //Log de operações!! não recomendado para voltar para o usuario, apenas para testes e registro de Log.
+
+        return barberMessageContainer;
     }
 
 }
