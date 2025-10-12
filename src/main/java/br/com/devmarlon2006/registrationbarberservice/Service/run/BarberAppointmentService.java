@@ -7,12 +7,12 @@ import br.com.devmarlon2006.registrationbarberservice.Service.model.DataTransfer
 import org.springframework.stereotype.Service;
 
 @Service
-public class Plus {
+public class BarberAppointmentService {
 
     private final BarberPlusShopManager barberPlusShopManager;
 
 
-    public Plus(BarberPlusShopManager barberPlusShopManager) {
+    public BarberAppointmentService(BarberPlusShopManager barberPlusShopManager) {
         this.barberPlusShopManager = barberPlusShopManager;
     }
 
