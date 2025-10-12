@@ -14,6 +14,7 @@ package br.com.devmarlon2006.registrationbarberservice.Controllers;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.MessageContainer;
 import br.com.devmarlon2006.registrationbarberservice.Service.connectionmodule.TestConectivity;
 import br.com.devmarlon2006.registrationbarberservice.Service.model.Barber;
+import br.com.devmarlon2006.registrationbarberservice.Service.model.DataTransferObject;
 import br.com.devmarlon2006.registrationbarberservice.Service.run.BarberService;
 import br.com.devmarlon2006.registrationbarberservice.Service.systemexeptions.ConnectionDestroyed;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +36,7 @@ public class BarberController {
     }
 
     @PostMapping("/Barber")
-    public ResponseEntity<?> SavBarber(@RequestBody Barber barber){
+    public ResponseEntity<?> SavBarber(@RequestBody DataTransferObject barberDTO){
 
         try{
             testConectivity.TestConectionData();
@@ -44,7 +45,7 @@ public class BarberController {
         }
 
 
-        MessageContainer<?,?> a = barberService.ProcessBarberRegistration( barber );
+        MessageContainer<?,?> a = barberService.ProcessBarberRegistration( barberDTO );
 
         if (a.getReponse().equals("error")){
 

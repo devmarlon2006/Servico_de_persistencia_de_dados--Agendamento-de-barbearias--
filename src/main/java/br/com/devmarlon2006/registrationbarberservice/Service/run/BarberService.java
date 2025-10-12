@@ -6,6 +6,7 @@ import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.Respons
 import br.com.devmarlon2006.registrationbarberservice.Service.connectionmodule.TestConectivity;
 import br.com.devmarlon2006.registrationbarberservice.Service.manager.repositorymanager.BarberRepositoryManagerService;
 import br.com.devmarlon2006.registrationbarberservice.Service.model.Barber;
+import br.com.devmarlon2006.registrationbarberservice.Service.model.DataTransferObject;
 import br.com.devmarlon2006.registrationbarberservice.Service.systemexeptions.ConnectionDestroyed;
 import br.com.devmarlon2006.registrationbarberservice.Service.verificationservices.Validation;
 import lombok.NonNull;
@@ -38,13 +39,16 @@ public class BarberService {
      * 4. Registra logs de operação (sucesso/erro)
      * 5. Constrói e retorna container com mensagens de resposta
      * 
-     * @param barber Entidade Barber a ser registrada
+     * @param barberDTO Entidade Barber a ser registrada
      * @return MessageContainer contendo status da operação e mensagens de log
      */
     @NonNull
-    public MessageContainer<MesagerComplements<?>, String> ProcessBarberRegistration(Barber barber){
+    public MessageContainer<MesagerComplements<?>, String> ProcessBarberRegistration(DataTransferObject barberDTO){
         MessageContainer<MesagerComplements<?> ,String> barberMessageContainer = new MessageContainer<>();
         List<ResponseMessages> list = new ArrayList<>();
+
+
+        Barber barber = (Barber) barberDTO.requiredType( Barber.class);
         
         // Teste de conectividade - operação crítica que bloqueia o fluxo em caso de falha
         try{

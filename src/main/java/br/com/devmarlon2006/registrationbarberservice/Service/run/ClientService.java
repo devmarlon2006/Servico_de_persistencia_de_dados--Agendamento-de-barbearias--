@@ -6,13 +6,13 @@ import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.Respons
 import br.com.devmarlon2006.registrationbarberservice.Service.connectionmodule.TestConectivity;
 import br.com.devmarlon2006.registrationbarberservice.Service.manager.repositorymanager.ClientRepositoryManagerService;
 import br.com.devmarlon2006.registrationbarberservice.Service.model.Client;
+import br.com.devmarlon2006.registrationbarberservice.Service.model.DataTransferObject;
 import br.com.devmarlon2006.registrationbarberservice.Service.systemexeptions.ConnectionDestroyed;
 import br.com.devmarlon2006.registrationbarberservice.Service.verificationservices.Validation;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
-import javax.sql.DataSource;
-import java.sql.SQLException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,17 +21,16 @@ public class ClientService {
 
     private final ClientRepositoryManagerService managerClient;
     private final TestConectivity test;
-    private final Execute execute;
 
-    public ClientService(ClientRepositoryManagerService managerClient, TestConectivity test, Execute execute) {
+    public ClientService(ClientRepositoryManagerService managerClient, TestConectivity test) {
 
         this.managerClient = managerClient;
         this.test = test;
-        this.execute = execute;
     }
 
 
-    public MessageContainer<MesagerComplements<?>, String> ProcessClientRegistration(@NonNull Client client) {
+    public MessageContainer<MesagerComplements<?>, String> ProcessClientRegistration(@NonNull DataTransferObject clientDTO) {
+        Client client = (Client) clientDTO.requiredType( Client.class) ;
         MessageContainer<MesagerComplements<?>, String> clientMessageContainer = new MessageContainer<>();
 
         try {

@@ -4,6 +4,7 @@ import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.Message
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseMessages;
 import br.com.devmarlon2006.registrationbarberservice.Service.connectionmodule.TestConectivity;
 import br.com.devmarlon2006.registrationbarberservice.Service.model.BarberShop;
+import br.com.devmarlon2006.registrationbarberservice.Service.model.DataTransferObject;
 import br.com.devmarlon2006.registrationbarberservice.Service.run.BarberShopService;
 import br.com.devmarlon2006.registrationbarberservice.Service.systemexeptions.ConnectionDestroyed;
 import org.springframework.http.HttpStatus;
@@ -23,7 +24,7 @@ public class BarberShopController {
     }
 
     @PostMapping("/BarberShop")
-    public ResponseEntity<?> SavBarberShop(@RequestBody BarberShop barberShopRecord){
+    public ResponseEntity<?> SavBarberShop(@RequestBody DataTransferObject barberShopDTO){
 
         try {
             testConectivity.TestConectionData();
@@ -37,7 +38,7 @@ public class BarberShopController {
 
         }
 
-        MessageContainer<?, ?> message = barberShopService.processBarberShopRegistration( barberShopRecord, barberShopRecord.getOwerID());
+        MessageContainer<?, ?> message = barberShopService.processBarberShopRegistration( barberShopDTO );
         return ResponseEntity.status( 200 ).body( message );
     }
 }

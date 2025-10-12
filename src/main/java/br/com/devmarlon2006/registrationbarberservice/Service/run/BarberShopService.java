@@ -7,6 +7,7 @@ import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.Respons
 import br.com.devmarlon2006.registrationbarberservice.Service.manager.repositorymanager.BarberRepositoryManagerService;
 import br.com.devmarlon2006.registrationbarberservice.Service.manager.repositorymanager.BarberShopRepositoryManager;
 import br.com.devmarlon2006.registrationbarberservice.Service.model.BarberShop;
+import br.com.devmarlon2006.registrationbarberservice.Service.model.DataTransferObject;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -34,8 +35,10 @@ public class BarberShopService {
 
 
     @NonNull
-    public MessageContainer<MesagerComplements<?>, String> processBarberShopRegistration(BarberShop barberShopRecord, String barberID){
+    public MessageContainer<MesagerComplements<?>, String> processBarberShopRegistration(DataTransferObject barberShopDTO){
         MessageContainer<MesagerComplements<?>, String> barberShopMessageContainer = new MessageContainer<>();
+        BarberShop barberShopRecord = (BarberShop) barberShopDTO.requiredType( BarberShop.class);
+        String barberID = barberShopRecord.getOwerID();
         boolean exists = barberRepository.existsById( barberID); //Busca BArber no banco de dados para verificar se existe
 
         if (exists) {

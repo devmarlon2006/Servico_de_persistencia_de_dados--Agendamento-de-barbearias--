@@ -10,8 +10,8 @@
 
 package br.com.devmarlon2006.registrationbarberservice.Controllers;
 
+import br.com.devmarlon2006.registrationbarberservice.Service.model.DataTransferObject;
 import br.com.devmarlon2006.registrationbarberservice.Service.run.ClientService;
-import br.com.devmarlon2006.registrationbarberservice.Service.run.Execute;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseMessages;
 import br.com.devmarlon2006.registrationbarberservice.Service.model.Client;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.MessageContainer;
@@ -65,7 +65,7 @@ public class ClientController {
 
 
     @PostMapping("/client")
-    public ResponseEntity<?> SavClient(@NonNull @RequestBody Client client){
+    public ResponseEntity<?> SavClient(@NonNull @RequestBody DataTransferObject client){
         try{
             testConectivity.TestConectionData();
         }catch (ConnectionDestroyed e){
