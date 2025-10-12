@@ -8,6 +8,7 @@ import br.com.devmarlon2006.registrationbarberservice.Service.manager.repository
 import br.com.devmarlon2006.registrationbarberservice.Service.model.Barber;
 import br.com.devmarlon2006.registrationbarberservice.Service.systemexeptions.ConnectionDestroyed;
 import br.com.devmarlon2006.registrationbarberservice.Service.verificationservices.Validation;
+import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -20,7 +21,8 @@ public class BarberService {
     private final Execute execute;
     private final TestConectivity test;
 
-    public BarberService(BarberRepositoryManagerService managerBarber, Execute execute, TestConectivity test) {
+    public BarberService(BarberRepositoryManagerService managerBarber,
+                         Execute execute, TestConectivity test) {
         this.managerBarber = managerBarber;
         this.execute = execute;
         this.test = test;
@@ -39,6 +41,7 @@ public class BarberService {
      * @param barber Entidade Barber a ser registrada
      * @return MessageContainer contendo status da operação e mensagens de log
      */
+    @NonNull
     public MessageContainer<MesagerComplements<?>, String> ProcessBarberRegistration(Barber barber){
         MessageContainer<MesagerComplements<?> ,String> barberMessageContainer = new MessageContainer<>();
         List<ResponseMessages> list = new ArrayList<>();
@@ -46,18 +49,23 @@ public class BarberService {
         // Teste de conectividade - operação crítica que bloqueia o fluxo em caso de falha
         try{
 
-            test.TestConectionData();
-            barberMessageContainer.addResponse("Success");
-            barberMessageContainer.addMesage( barberMessageContainer.newAresponseComplements(
-                    ResponseMessages.SUCCESS, "Success" ), 0 );
+            ResponseMessages statusOperation  = test.TestConectionData();
+
+            if (statusOperation.equals(ResponseMessages.SUCCESS)){
+
+                barberMessageContainer.addResponse("Success");
+                barberMessageContainer.addMesage( barberMessageContainer.newAresponseComplements(
+                        ResponseMessages.SUCCESS, "Success" ), 0 );
+
+            }
 
         }catch (ConnectionDestroyed e){
+            barberMessageContainer.addResponse("Error");
 
             barberMessageContainer.addMesage(
                     barberMessageContainer.newAresponseComplements(
-                            ResponseMessages.ERROR, "Banco indisponivel"), 0);
+                            ResponseMessages.ERROR, "Erro fatal inesperado - ID Erro: Br20"), 0);
 
-            barberMessageContainer.addResponse("Error");
             return barberMessageContainer;
 
         }

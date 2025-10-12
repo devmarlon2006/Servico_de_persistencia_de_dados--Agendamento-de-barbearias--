@@ -6,15 +6,12 @@ import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.Respons
 import br.com.devmarlon2006.registrationbarberservice.Service.connectionmodule.TestConectivity;
 import br.com.devmarlon2006.registrationbarberservice.Service.manager.SuperRepositoryManager;
 import br.com.devmarlon2006.registrationbarberservice.Service.model.BarberShop;
-import br.com.devmarlon2006.registrationbarberservice.Service.systemexeptions.ConnectionDestroyed;
 import br.com.devmarlon2006.registrationbarberservice.Service.verificationservices.Validation;
 import org.springframework.stereotype.Service;
 
-import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.List;
 
-//
 @Service
 public class BarberShopRepositoryManager implements SuperRepositoryManager<BarberShop, String> {
 
@@ -24,13 +21,13 @@ public class BarberShopRepositoryManager implements SuperRepositoryManager<Barbe
     private final TestConectivity testConectivity;
 
 
-    public BarberShopRepositoryManager(BarberShopRepository barberShopRepository, TestConectivity testConectivity, DataSource dataSource) {
+    public BarberShopRepositoryManager(BarberShopRepository barberShopRepository, TestConectivity testConectivity) {
         this.barberShopRepository = barberShopRepository;
         this.testConectivity = testConectivity;
     }
 
     @Override
-    public MesagerComplements<String> postOnRepository(BarberShop barberShopRecord){
+    public MesagerComplements<String> postOnRepository(BarberShop barberShopRecord) {
 
         MesagerComplements<String> message = new MesagerComplements<>();
 
@@ -39,12 +36,12 @@ public class BarberShopRepositoryManager implements SuperRepositoryManager<Barbe
             if (repositoryGET( barberShopRecord, TypeOfReturn.NEGATIVE ) == ResponseMessages.WARNING) {
 
                 message.setStatus( ResponseMessages.ERROR );
-                message.setMessage("Erro interno - ID erro: bs10");
+                message.setMessage("Erro interno - ID erro: bs10x87");
                 return message;
             }
 
         }catch (NullPointerException e){
-            message.setMessage( "Erro inesperado - ID Erro: bs11" );
+            message.setMessage( "Erro ineterno ao tentar buscar o registro - ID Erro: bs11x99" );
             return message;
         }
 
@@ -58,13 +55,12 @@ public class BarberShopRepositoryManager implements SuperRepositoryManager<Barbe
                 message.setStatus(ResponseMessages.SUCCESS);
 
             } catch (NullPointerException e) {
-                message.setMessage("Erro interno - ID Erro: bs12");
+                message.setMessage("Erro interno - ID Erro: bs12x33");
                 message.setStatus(ResponseMessages.ERROR);
                return message;
             }
 
         }
-
         return message;
     }
 

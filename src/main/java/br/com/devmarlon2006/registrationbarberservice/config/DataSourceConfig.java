@@ -5,7 +5,6 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import javax.sql.DataSource;
 
@@ -22,7 +21,7 @@ public class DataSourceConfig {
     String username;
     @Value( "${spring.datasource.password}" )
     String password;
-    @Value( "${spring.datasource.driver-class-name}" )
+    @Value( "${spring.datasource.driver-class-name}")
     String driverClassName;
 
 
@@ -39,6 +38,6 @@ public class DataSourceConfig {
         hikariConfig.setMaximumPoolSize( 10 );
         hikariConfig.setMinimumIdle( 5 );
 
-        return new HikariDataSource(hikariConfig);
+        return new HikariDataSource( hikariConfig );
     }
 }

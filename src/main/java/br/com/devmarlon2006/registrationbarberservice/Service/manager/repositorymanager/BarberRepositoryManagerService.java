@@ -12,7 +12,6 @@ package br.com.devmarlon2006.registrationbarberservice.Service.manager.repositor
 
 import br.com.devmarlon2006.registrationbarberservice.Repository.BarberRepository;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.MesagerComplements;
-import br.com.devmarlon2006.registrationbarberservice.Service.connectionmodule.TestConectivity;
 import br.com.devmarlon2006.registrationbarberservice.Service.manager.SuperRepositoryManager;
 import br.com.devmarlon2006.registrationbarberservice.Service.model.Barber;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseMessages;
@@ -27,11 +26,9 @@ import java.util.List;
 public class BarberRepositoryManagerService implements SuperRepositoryManager<Barber,String> {
 
     private final BarberRepository barberRepository;
-    private final TestConectivity testConectivity;
 
-    public BarberRepositoryManagerService(BarberRepository barberRepository, TestConectivity testConectivity) {
+    public BarberRepositoryManagerService(BarberRepository barberRepository) {
         this.barberRepository = barberRepository;
-        this.testConectivity = testConectivity;
     }
 
     @Override
@@ -42,12 +39,12 @@ public class BarberRepositoryManagerService implements SuperRepositoryManager<Ba
         try{
             if (repositoryGET( barberRecord, TypeOfReturn.NEGATIVE ) == ResponseMessages.WARNING){
                message.setStatus( ResponseMessages.ERROR );
-               message.setMessage("Erro interno ");
+               message.setMessage("Erro interno - ID Erro: ba10x876");
                return message;
             }
         }catch (NullPointerException e){
             message.setMessage("Erro inesperado");
-            message.setMessage( "Erro interno ao tentar buscar o registro" );
+            message.setMessage( "Erro interno ao tentar buscar o registro - ID Erro: ba11x11" );
             return message;
         }
 
@@ -57,14 +54,14 @@ public class BarberRepositoryManagerService implements SuperRepositoryManager<Ba
                 barberRepository.save(barberRecord);
                 message.setMessage("Registro persistido com sucesso");
             }catch (NullPointerException e){
-                message.setMessage("Erro interno ao tentar persistir o registro - ID erro: ba11");
+                message.setMessage("Erro interno ao tentar persistir o registro - ID erro: ba11x12");
                 message.setStatus(ResponseMessages.ERROR);
                return message;
             }
             message.setStatus(ResponseMessages.SUCCESS);
         }else {
             Validation.ClearObject(barberRecord);
-            message.setMessage("Erro interno ao tentar persistir o registro - ID erro: ba12");
+            message.setMessage("Erro interno ao tentar persistir o registro - ID erro: ba12x95");
             message.setStatus(ResponseMessages.ERROR);
             return message ;
         }
@@ -75,7 +72,10 @@ public class BarberRepositoryManagerService implements SuperRepositoryManager<Ba
     public ResponseMessages repositoryGET(Barber barber, TypeOfReturn typeOfReturn){
         if( barberRepository.existsById(barber.getId()) || barberRepository.existsByEmail(barber.getEmail()))
         {
-            return testConectivity.retrieveWarning();
+            return switch (typeOfReturn){
+                case POSITIVE -> ResponseMessages.SUCCESS;
+                case NEGATIVE -> ResponseMessages.WARNING;
+            };
         }
        return ResponseMessages.SUCCESS;
     }

@@ -12,6 +12,11 @@ package br.com.devmarlon2006.registrationbarberservice.Service.manager.repositor
 
 
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import br.com.devmarlon2006.registrationbarberservice.Repository.ClientRepository;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.MesagerComplements;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseMessages;
@@ -19,10 +24,6 @@ import br.com.devmarlon2006.registrationbarberservice.Service.connectionmodule.T
 import br.com.devmarlon2006.registrationbarberservice.Service.manager.SuperRepositoryManager;
 import br.com.devmarlon2006.registrationbarberservice.Service.model.Client;
 import br.com.devmarlon2006.registrationbarberservice.Service.verificationservices.Validation;
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class ClientRepositoryManagerService implements SuperRepositoryManager<Client, String> {
@@ -65,12 +66,12 @@ public class ClientRepositoryManagerService implements SuperRepositoryManager<Cl
         try {
             if (repositoryGET( ClientRecord , TypeOfReturn.NEGATIVE ).equals( ResponseMessages.WARNING )) {
                 message.setStatus( ResponseMessages.ERROR );
-                message.setMessage("Erro interno - ID erro: cl10");
+                message.setMessage("Erro interno - ID erro: cl10x67");
                 return message;
             }
         } catch (NullPointerException e) {
             message.setStatus( ResponseMessages.ERROR );
-            message.setMessage("Erro interno - ID Erro: cl11");
+            message.setMessage("Erro interno ao tentar buscar o registro - ID Erro: cl11x68");
             return message;
         }
 
@@ -78,12 +79,12 @@ public class ClientRepositoryManagerService implements SuperRepositoryManager<Cl
 
             clientRepository.save( ClientRecord );
             message.setStatus( ResponseMessages.SUCCESS );
-            message.setMessage("Registro persistido com sucesso - ID Success: cl12");
+            message.setMessage("Registro persistido com sucesso - ID Success: cl12x69");
 
         }else {
             Validation.ClearObject( ClientRecord );
             message.setStatus( ResponseMessages.ERROR );
-            message.setMessage("Erro interno ao tentar persistir o registro - ID erro: cl13");
+            message.setMessage("Erro interno ao tentar persistir o registro - ID erro: cl13x70");
             return message;
         }
 

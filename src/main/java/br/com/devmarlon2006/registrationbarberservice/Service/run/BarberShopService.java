@@ -7,6 +7,7 @@ import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.Respons
 import br.com.devmarlon2006.registrationbarberservice.Service.manager.repositorymanager.BarberRepositoryManagerService;
 import br.com.devmarlon2006.registrationbarberservice.Service.manager.repositorymanager.BarberShopRepositoryManager;
 import br.com.devmarlon2006.registrationbarberservice.Service.model.BarberShop;
+import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
 
@@ -32,21 +33,24 @@ public class BarberShopService {
     }
 
 
+    @NonNull
     public MessageContainer<MesagerComplements<?>, String> processBarberShopRegistration(BarberShop barberShopRecord, String barberID){
         MessageContainer<MesagerComplements<?>, String> barberShopMessageContainer = new MessageContainer<>();
         boolean exists = barberRepository.existsById( barberID); //Busca BArber no banco de dados para verificar se existe
 
         if (exists) {
+
             barberShopMessageContainer.addMesage(
                     barberShopMessageContainer.newAresponseComplements( ResponseMessages.SUCCESS,
                             "Barber found" ), 0 );
 
             barberShopRecord.setOwnerId( barberRepositoryManagerService.fyndBarber( barberID ));
         }else {
+            barberShopMessageContainer.addResponse("Error");
+
             barberShopMessageContainer.addMesage(
                     barberShopMessageContainer.newAresponseComplements( ResponseMessages.WARNING,
                             "Barber not found" ), 0);
-            barberShopMessageContainer.addResponse("Error");
             return barberShopMessageContainer;
         }
 
@@ -57,10 +61,12 @@ public class BarberShopService {
                 barberShopMessageContainer.addMesage(saveResponse, 1);
             }
         }catch (NullPointerException e){
+            barberShopMessageContainer.addResponse("Error");
+
             barberShopMessageContainer.addMesage(
                     barberShopMessageContainer.newAresponseComplements(
                             ResponseMessages.ERROR, "Fatal Error"), 0);
-            barberShopMessageContainer.addResponse("Error");
+
             return barberShopMessageContainer;
         }
 

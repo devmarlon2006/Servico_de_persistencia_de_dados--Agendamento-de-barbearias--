@@ -11,6 +11,8 @@ import br.com.devmarlon2006.registrationbarberservice.Service.verificationservic
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
+import javax.sql.DataSource;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +24,7 @@ public class ClientService {
     private final Execute execute;
 
     public ClientService(ClientRepositoryManagerService managerClient, TestConectivity test, Execute execute) {
+
         this.managerClient = managerClient;
         this.test = test;
         this.execute = execute;
@@ -33,13 +36,17 @@ public class ClientService {
 
         try {
             test.TestConectionData();
+
             clientMessageContainer.addMesage( clientMessageContainer.newAresponseComplements(
                     ResponseMessages.SUCCESS, "Banco disponivel" ), 0 );
+
         } catch (ConnectionDestroyed e) {
             clientMessageContainer.addResponse( "Error" );
+
             clientMessageContainer.addMesage(
                     clientMessageContainer.newAresponseComplements(
-                            ResponseMessages.ERROR, "Fatal Error - ID: Erro: cl20" ), 0 );
+                            ResponseMessages.ERROR, "Erro fatal inesperado - ID: Erro: cl20" ), 0 );
+
             return clientMessageContainer;
         }
 
@@ -47,10 +54,12 @@ public class ClientService {
 
             if (!(managerClient.isInstance( client.getClass() ))) {
                 Validation.ClearObject( client );
+
                 clientMessageContainer.addResponse( "Error" );
                 clientMessageContainer.addMesage(
                         clientMessageContainer.newAresponseComplements(
                                 ResponseMessages.WARNING, "Invalid Object" ), 0 );
+
                 return clientMessageContainer;
             }
 
@@ -64,9 +73,11 @@ public class ClientService {
 
         } catch (NullPointerException e) {
             clientMessageContainer.addResponse( "Error" );
+
             clientMessageContainer.addMesage(
                     clientMessageContainer.newAresponseComplements(
                             ResponseMessages.ERROR, "Repository Error" ), 0 );
+
             return clientMessageContainer;
         }
 

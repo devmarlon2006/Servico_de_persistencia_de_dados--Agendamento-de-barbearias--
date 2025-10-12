@@ -71,11 +71,11 @@ public class ClientController {
         }catch (ConnectionDestroyed e){
             return ResponseEntity.status( 400 ).body( new MessageContainer<>(e.getMessage()));
         }
-//
-//        if(testConectivity.TestConection( API_URL ) == ResponseMessages.WARNING){
-//
-//            return ResponseEntity.status( 503 ).body( HttpStatus.SERVICE_UNAVAILABLE );
-//        }
+
+        if(testConectivity.TestConection( API_URL ) == ResponseMessages.WARNING){
+
+            return ResponseEntity.status( 503 ).body( HttpStatus.SERVICE_UNAVAILABLE );
+        }
 
         MessageContainer<?,?> a =  executeClient.ProcessClientRegistration( client );
 

@@ -10,7 +10,6 @@
 
 package br.com.devmarlon2006.registrationbarberservice.Service.run;
 
-import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.MessageContainer;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseMessages;
 import org.springframework.stereotype.Service;
 
