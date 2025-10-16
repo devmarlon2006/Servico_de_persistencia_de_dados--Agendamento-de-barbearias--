@@ -12,7 +12,8 @@ package br.com.devmarlon2006.registrationbarberservice.Service.manager.repositor
 
 import br.com.devmarlon2006.registrationbarberservice.Repository.BarberRepository;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.MesagerComplements;
-import br.com.devmarlon2006.registrationbarberservice.Service.manager.SuperRepositoryManager;
+import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.StatusOperation;
+import br.com.devmarlon2006.registrationbarberservice.Service.manager.supersmanagers.SuperRepositoryManager;
 import br.com.devmarlon2006.registrationbarberservice.Service.model.Barber;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseMessages;
 import br.com.devmarlon2006.registrationbarberservice.Service.verificationservices.Validation;
@@ -32,40 +33,32 @@ public class BarberRepositoryManagerService implements SuperRepositoryManager<Ba
     }
 
     @Override
-    public MesagerComplements<String> postOnRepository(Barber barberRecord) {
-
-        MesagerComplements<String> message = new MesagerComplements<>();
-
+    public MesagerComplements postOnRepository(Barber barberRecord) {
         try{
+
             if (repositoryGET( barberRecord, TypeOfReturn.NEGATIVE ) == ResponseMessages.WARNING){
-               message.setStatus( ResponseMessages.ERROR );
-               message.setMessage("Erro interno - ID Erro: ba10x876");
-               return message;
+               return new MesagerComplements( ResponseMessages.ERROR , StatusOperation.ERROR_VALIDATION_FAILED );
             }
+
         }catch (NullPointerException e){
-            message.setMessage("Erro inesperado");
-            message.setMessage( "Erro interno ao tentar buscar o registro - ID Erro: ba11x11" );
-            return message;
+
+           return new MesagerComplements(ResponseMessages.ERROR, StatusOperation.ERROR_UNEXPECTED);
+
         }
 
         if(validateAtribiutesFormat( barberRecord )){
 
             try{
                 barberRepository.save(barberRecord);
-                message.setMessage("Registro persistido com sucesso");
-            }catch (NullPointerException e){
-                message.setMessage("Erro interno ao tentar persistir o registro - ID erro: ba11x12");
-                message.setStatus(ResponseMessages.ERROR);
-               return message;
+            }catch (Exception e){
+               return new MesagerComplements(ResponseMessages.ERROR, StatusOperation.ERROR_UNEXPECTED);
             }
-            message.setStatus(ResponseMessages.SUCCESS);
+
         }else {
-            Validation.ClearObject(barberRecord);
-            message.setMessage("Erro interno ao tentar persistir o registro - ID erro: ba12x95");
-            message.setStatus(ResponseMessages.ERROR);
-            return message ;
+            return new MesagerComplements(ResponseMessages.ERROR, StatusOperation.ERROR_VALIDATION_FAILED) ;
         }
-        return message ;
+
+        return new MesagerComplements(ResponseMessages.SUCCESS, StatusOperation.SUCCESS_ENTITY_CREATED) ;
     }
 
     @Override

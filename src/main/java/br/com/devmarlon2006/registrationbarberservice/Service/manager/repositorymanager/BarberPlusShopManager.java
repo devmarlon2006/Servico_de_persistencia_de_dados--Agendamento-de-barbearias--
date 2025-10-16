@@ -2,6 +2,7 @@ package br.com.devmarlon2006.registrationbarberservice.Service.manager.repositor
 
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.MesagerComplements;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseMessages;
+import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.StatusOperation;
 import br.com.devmarlon2006.registrationbarberservice.Service.model.Barber;
 import br.com.devmarlon2006.registrationbarberservice.Service.model.BarberShop;
 import org.springframework.stereotype.Service;
@@ -18,9 +19,9 @@ public class BarberPlusShopManager {
         this.barberRepositoryManagerService = barberRepositoryManagerService;
     }
 
-    public MesagerComplements<String> processBarberPlusShop(BarberShop barberShopRecord, Barber barberRecord) {
+    public MesagerComplements processBarberPlusShop(BarberShop barberShopRecord, Barber barberRecord) {
 
-        MesagerComplements<String> Operation = barberRepositoryManagerService.postOnRepository( barberRecord );
+        MesagerComplements Operation = barberRepositoryManagerService.postOnRepository( barberRecord );
 
         if (Operation.getStatus() == ResponseMessages.ERROR)
         {
@@ -30,12 +31,18 @@ public class BarberPlusShopManager {
         Barber barber = barberRepositoryManagerService.fyndBarber( barberRecord.getId() );
 
         if (barber == null) {
-            return new MesagerComplements<>(ResponseMessages.ERROR, "Fatal Error");
+            return new MesagerComplements(ResponseMessages.ERROR, StatusOperation.ERROR_ENTITY_NOT_FOUND);
         }
 
-        barberShopRecord.setOwnerId( barber );
-        MesagerComplements<String> message = barberShopRepositoryManager.postOnRepository( barberShopRecord );
-        message.setMessage( "Barber and Shop saved" );
+
+        try{
+            barberShopRecord.setOwnerId( barber );
+        }catch (NullPointerException e){
+            return new MesagerComplements(ResponseMessages.ERROR, StatusOperation.ERROR_UNEXPECTED);
+        }
+
+        MesagerComplements message = barberShopRepositoryManager.postOnRepository( barberShopRecord );
+
         return message;
     }
 }

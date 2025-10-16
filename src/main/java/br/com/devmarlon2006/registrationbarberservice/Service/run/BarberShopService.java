@@ -4,8 +4,10 @@ import br.com.devmarlon2006.registrationbarberservice.Repository.BarberRepositor
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.MesagerComplements;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.MessageContainer;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseMessages;
+import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.StatusOperation;
 import br.com.devmarlon2006.registrationbarberservice.Service.manager.repositorymanager.BarberRepositoryManagerService;
 import br.com.devmarlon2006.registrationbarberservice.Service.manager.repositorymanager.BarberShopRepositoryManager;
+import br.com.devmarlon2006.registrationbarberservice.Service.model.Barber;
 import br.com.devmarlon2006.registrationbarberservice.Service.model.BarberShop;
 import br.com.devmarlon2006.registrationbarberservice.Service.model.DataTransferObject;
 import lombok.NonNull;
@@ -35,42 +37,30 @@ public class BarberShopService {
 
 
     @NonNull
-    public MessageContainer<MesagerComplements<?>, String> processBarberShopRegistration(DataTransferObject barberShopDTO){
-        MessageContainer<MesagerComplements<?>, String> barberShopMessageContainer = new MessageContainer<>();
+    public MessageContainer<MesagerComplements, String> processBarberShopRegistration(DataTransferObject barberShopDTO){
+        MessageContainer<MesagerComplements, String> barberShopMessageContainer = new MessageContainer<>();
         BarberShop barberShopRecord = (BarberShop) barberShopDTO.requiredType( BarberShop.class);
+
         String barberID = barberShopRecord.getOwerID();
         boolean exists = barberRepository.existsById( barberID); //Busca BArber no banco de dados para verificar se existe
 
         if (exists) {
-
-            barberShopMessageContainer.addMesage(
-                    barberShopMessageContainer.newAresponseComplements( ResponseMessages.SUCCESS,
-                            "Barber found" ), 0 );
-
             barberShopRecord.setOwnerId( barberRepositoryManagerService.fyndBarber( barberID ));
         }else {
-            barberShopMessageContainer.addResponse("Error");
-
-            barberShopMessageContainer.addMesage(
-                    barberShopMessageContainer.newAresponseComplements( ResponseMessages.WARNING,
-                            "Barber not found" ), 0);
-            return barberShopMessageContainer;
+           return new MessageContainer<>( ResponseMessages.ERROR.getResponseMessage(),
+                   new MesagerComplements(ResponseMessages.ERROR , StatusOperation.ERROR_ENTITY_NOT_FOUND ));
         }
 
         try{
-            MesagerComplements<?> saveResponse = barberShopRepositoryManager.postOnRepository(barberShopRecord);
+            MesagerComplements saveResponse = barberShopRepositoryManager.postOnRepository(barberShopRecord);
             if (saveResponse.getStatus().equals(ResponseMessages.SUCCESS))
             {
-                barberShopMessageContainer.addMesage(saveResponse, 1);
+                barberShopMessageContainer.addResponse( ResponseMessages.SUCCESS.getResponseMessage() );
+                barberShopMessageContainer.addMesage(saveResponse, 0);
             }
-        }catch (NullPointerException e){
-            barberShopMessageContainer.addResponse("Error");
-
-            barberShopMessageContainer.addMesage(
-                    barberShopMessageContainer.newAresponseComplements(
-                            ResponseMessages.ERROR, "Fatal Error"), 0);
-
-            return barberShopMessageContainer;
+        }catch (NullPointerException e) {
+            return new MessageContainer<>( ResponseMessages.ERROR.getResponseMessage(),
+                    new MesagerComplements( ResponseMessages.ERROR, StatusOperation.ERROR_UNEXPECTED ) );
         }
 
         return barberShopMessageContainer;

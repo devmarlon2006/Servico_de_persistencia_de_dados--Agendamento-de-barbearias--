@@ -3,8 +3,9 @@ package br.com.devmarlon2006.registrationbarberservice.Service.manager.repositor
 import br.com.devmarlon2006.registrationbarberservice.Repository.BarberShopRepository;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.MesagerComplements;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseMessages;
+import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.StatusOperation;
 import br.com.devmarlon2006.registrationbarberservice.Service.connectionmodule.TestConectivity;
-import br.com.devmarlon2006.registrationbarberservice.Service.manager.SuperRepositoryManager;
+import br.com.devmarlon2006.registrationbarberservice.Service.manager.supersmanagers.SuperRepositoryManager;
 import br.com.devmarlon2006.registrationbarberservice.Service.model.BarberShop;
 import br.com.devmarlon2006.registrationbarberservice.Service.verificationservices.Validation;
 import org.springframework.stereotype.Service;
@@ -27,22 +28,16 @@ public class BarberShopRepositoryManager implements SuperRepositoryManager<Barbe
     }
 
     @Override
-    public MesagerComplements<String> postOnRepository(BarberShop barberShopRecord) {
-
-        MesagerComplements<String> message = new MesagerComplements<>();
+    public MesagerComplements postOnRepository(BarberShop barberShopRecord) {
 
         try{
 
             if (repositoryGET( barberShopRecord, TypeOfReturn.NEGATIVE ) == ResponseMessages.WARNING) {
-
-                message.setStatus( ResponseMessages.ERROR );
-                message.setMessage("Erro interno - ID erro: bs10x87");
-                return message;
+                return new MesagerComplements(ResponseMessages.ERROR, StatusOperation.ERROR_UNIQUE_CONSTRAINT);
             }
 
         }catch (NullPointerException e){
-            message.setMessage( "Erro ineterno ao tentar buscar o registro - ID Erro: bs11x99" );
-            return message;
+            return new MesagerComplements(ResponseMessages.ERROR, StatusOperation.ERROR_UNEXPECTED);
         }
 
         if (barberShopRecord.getId() != null || barberShopRecord.getOwnerId() != null){
@@ -51,17 +46,14 @@ public class BarberShopRepositoryManager implements SuperRepositoryManager<Barbe
 
                 barberShopRepository.save(barberShopRecord);
 
-                message.setMessage("Registro persistido com sucesso");
-                message.setStatus(ResponseMessages.SUCCESS);
-
-            } catch (NullPointerException e) {
-                message.setMessage("Erro interno - ID Erro: bs12x33");
-                message.setStatus(ResponseMessages.ERROR);
-               return message;
+            } catch (Exception e) {
+               return new MesagerComplements(ResponseMessages.ERROR, StatusOperation.ERROR_UNEXPECTED);
             }
 
         }
-        return message;
+
+        return new MesagerComplements(ResponseMessages.SUCCESS, StatusOperation.SUCCESS_ENTITY_CREATED);
+
     }
 
     @Override

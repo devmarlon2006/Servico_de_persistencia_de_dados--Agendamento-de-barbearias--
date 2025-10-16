@@ -12,16 +12,18 @@ package br.com.devmarlon2006.registrationbarberservice.Service.manager.repositor
 
 
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.StatusOperation;
 import org.springframework.stereotype.Service;
 
 import br.com.devmarlon2006.registrationbarberservice.Repository.ClientRepository;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.MesagerComplements;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseMessages;
 import br.com.devmarlon2006.registrationbarberservice.Service.connectionmodule.TestConectivity;
-import br.com.devmarlon2006.registrationbarberservice.Service.manager.SuperRepositoryManager;
+import br.com.devmarlon2006.registrationbarberservice.Service.manager.supersmanagers.SuperRepositoryManager;
 import br.com.devmarlon2006.registrationbarberservice.Service.model.Client;
 import br.com.devmarlon2006.registrationbarberservice.Service.verificationservices.Validation;
 
@@ -37,73 +39,33 @@ public class ClientRepositoryManagerService implements SuperRepositoryManager<Cl
         this.testConectivity = testConectivity;
     }
 
-    /**
-     * Tenta persistir um registro de {@link Client} aplicando validações prévias e verificações de conflito.
-     *
-     * Regras de negócio:
-     * - Se o registro for nulo, é considerado inexistente e o fluxo retorna {@code ERROR}.
-     * - Antes de salvar, verifica conflitos com {@link #repositoryGET(Client, TypeOfReturn)}:
-     *   - Se houver conflito (cliente já existente por id/email/username), retorna {@code ERROR}.
-     * - Se os atributos tiverem formato válido ({@link #validateAtribiutesFormat(Client)}) e o objeto for
-     *   reconhecido como instância de {@link Client} ({@link #isInstance(Class)}), o registro é salvo.
-     *   Caso contrário, o objeto é "limpo" via {@link Validation#ClearObject(Object)} (sem efeito colateral externo) e segue com SUCCESS.
-     *
-     * Observações:
-     * - Em caso de exceções de fluxo (objeto inexistente ou conflito de dados), retorna {@code ERROR}.
-     * - Na ausência de erros/avisos, retorna {@code SUCCESS}.
-     *
-     * Efeitos colaterais:
-     * - Pode executar {@code clientRepository.save(ClientRecord)} quando as validações forem aprovadas.
-     *
-     * @param ClientRecord registro do cliente a ser validado e persistido
-     * @return {@link ResponseMessages#SUCCESS} em caso de êxito; {@link ResponseMessages#ERROR} quando houver
-     *         objeto nulo, conflito detectado ou exceção esperada no fluxo de validação.
-     */
+
     @Override
-    public MesagerComplements<String> postOnRepository(Client ClientRecord) {
-        MesagerComplements<String> message = new MesagerComplements<>();
+    public MesagerComplements postOnRepository(Client ClientRecord) {
 
         try {
             if (repositoryGET( ClientRecord , TypeOfReturn.NEGATIVE ).equals( ResponseMessages.WARNING )) {
-                message.setStatus( ResponseMessages.ERROR );
-                message.setMessage("Erro interno - ID erro: cl10x67");
-                return message;
+                return new MesagerComplements(ResponseMessages.ERROR, StatusOperation.ERROR_UNIQUE_CONSTRAINT);
             }
         } catch (NullPointerException e) {
-            message.setStatus( ResponseMessages.ERROR );
-            message.setMessage("Erro interno ao tentar buscar o registro - ID Erro: cl11x68");
-            return message;
+           return new MesagerComplements(ResponseMessages.ERROR, StatusOperation.ERROR_UNEXPECTED);
         }
 
         if(validateAtribiutesFormat( ClientRecord )) {
 
-            clientRepository.save( ClientRecord );
-            message.setStatus( ResponseMessages.SUCCESS );
-            message.setMessage("Registro persistido com sucesso - ID Success: cl12x69");
+            try{
+                clientRepository.save( ClientRecord );
+            }catch (Exception e){
+                return new MesagerComplements(ResponseMessages.ERROR, StatusOperation.ERROR_UNEXPECTED);
+            }
 
         }else {
-            Validation.ClearObject( ClientRecord );
-            message.setStatus( ResponseMessages.ERROR );
-            message.setMessage("Erro interno ao tentar persistir o registro - ID erro: cl13x70");
-            return message;
+            return  new MesagerComplements(ResponseMessages.ERROR, StatusOperation.ERROR_VALIDATION_FAILED);
         }
 
-        return message;
+        return new MesagerComplements(ResponseMessages.SUCCESS, StatusOperation.SUCCESS_ENTITY_CREATED);
     }
 
-    /**
-     * Verifica a existência de um {@link Client} no repositório com base em múltiplos campos (id, email, username).
-     *
-     * Interpretação do retorno:
-     * - {@link ResponseMessages#ERROR}: existe um registro com mesmo id, email ou username (conflito).
-     * - {@link ResponseMessages#SUCCESS}: não há registro conflitante (livre para persistir).
-     *
-     * Nota:
-     * - Este método não lança exceções; apenas sinaliza o estado por meio de {@link ResponseMessages}.
-     *
-     * @param ClientRecord cliente de referência para checagem de existência
-     * @return {@link ResponseMessages#ERROR} se já existir; {@link ResponseMessages#SUCCESS} caso contrário
-     */
     @Override
     public ResponseMessages repositoryGET(Client ClientRecord, TypeOfReturn typeOfReturn) {
         if (clientRepository.existsById( ClientRecord.getId() ) || clientRepository.existsByEmail( ClientRecord.getEmail()) ||
@@ -118,16 +80,7 @@ public class ClientRepositoryManagerService implements SuperRepositoryManager<Cl
     }
 
 
-    /**
-     * Valida o formato dos principais atributos de {@link Client}:
-     * - Nome: apenas letras e espaços ({@link Validation#NameIsCorrect(String)})
-     * - Email: padrão de email válido ({@link Validation#EmailIsCorrect(String)})
-     * - Senha: força mínima (número, minúscula, maiúscula, caractere especial, sem espaços, min. 8) ({@link Validation#PasswordIsCorrect(String)})
-     * - ID: composto apenas por dígitos ({@link Validation#MatchCharacter(String)})
-     *
-     * @param client cliente a ser validado
-     * @return true se todos os atributos passarem nas validações; false caso contrário
-     */
+
     public boolean validateAtribiutesFormat(Client client) {
         List<Boolean> list = new ArrayList<>();
 

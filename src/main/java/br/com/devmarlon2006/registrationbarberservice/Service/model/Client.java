@@ -53,6 +53,4 @@ public class Client {
 
     @Column(name = "age")
     private Integer age;
-
-
 }

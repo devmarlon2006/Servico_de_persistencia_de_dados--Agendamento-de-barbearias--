@@ -25,9 +25,10 @@ public class MessageContainer<T,S> {
     private String reponse;
     private List<T> ResponseComplements; // Codigo ou mensagem de erro
 
-    public MessageContainer(T message) {
+    public MessageContainer(String response,T message) {
         this.ResponseComplements = new ArrayList<>();
         this.ResponseComplements.add(message);
+        this.reponse = response;
     }
 
     public MessageContainer() {
@@ -55,7 +56,7 @@ public class MessageContainer<T,S> {
         }
     }
 
-    public MesagerComplements<S> newAresponseComplements(ResponseMessages responseMessages, S message){
-        return new MesagerComplements<>(responseMessages, message);
+    public MesagerComplements newAresponseComplements(ResponseMessages responseMessages, StatusOperation currentStatus){
+        return new MesagerComplements(responseMessages, currentStatus);
     }
 }

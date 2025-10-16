@@ -13,10 +13,10 @@ package br.com.devmarlon2006.registrationbarberservice.Controllers;
 
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.MessageContainer;
 import br.com.devmarlon2006.registrationbarberservice.Service.connectionmodule.TestConectivity;
-import br.com.devmarlon2006.registrationbarberservice.Service.model.Barber;
 import br.com.devmarlon2006.registrationbarberservice.Service.model.DataTransferObject;
 import br.com.devmarlon2006.registrationbarberservice.Service.run.BarberService;
 import br.com.devmarlon2006.registrationbarberservice.Service.systemexeptions.ConnectionDestroyed;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,22 +37,28 @@ public class BarberController {
 
     @PostMapping("/Barber")
     public ResponseEntity<?> SavBarber(@RequestBody DataTransferObject barberDTO){
+        MessageContainer<?,?> registrationResponse;
 
         try{
             testConectivity.TestConectionData();
-        }catch (ConnectionDestroyed e){
+        }catch (ConnectionDestroyed e) {
             return ResponseEntity.status( 400 ).body( "Error" );
         }
 
+        try{
 
-        MessageContainer<?,?> a = barberService.ProcessBarberRegistration( barberDTO );
+            registrationResponse = barberService.ProcessBarberRegistration( barberDTO );
 
-        if (a.getReponse().equals("error")){
+            if (registrationResponse.getReponse().equals("error")){
 
-            return ResponseEntity.status( 400 ).body( "Error" );
+                return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( "Erro Interno ao registrar o barbero" );
 
+            }
+
+        }catch (NullPointerException e){
+            return ResponseEntity.status( HttpStatus.INTERNAL_SERVER_ERROR ).body( "Error" );
         }
 
-        return ResponseEntity.status( 200 ).body( "Ok" );
+        return ResponseEntity.status( HttpStatus.OK ).body( registrationResponse );
     }
 }

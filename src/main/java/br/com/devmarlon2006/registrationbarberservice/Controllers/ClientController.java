@@ -26,28 +26,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Controlador REST responsável pela gestão de operações relacionadas a clientes no sistema.
- * 
- * <p>Este controller expõe endpoints HTTP para o cadastro e processamento de informações de clientes,
- * atuando como camada de entrada da aplicação e orquestrando validações de conectividade antes de
- * delegar operações de negócio aos serviços apropriados.</p>
- * 
- * <p><b>Mapeamento Base:</b> {@code /DataSave}</p>
- * 
- * <p><b>Responsabilidades:</b></p>
- * <ul>
- *   <li>Receber requisições HTTP de cadastro de clientes</li>
- *   <li>Validar conectividade com banco de dados antes de processar requisições</li>
- *   <li>Validar conectividade com APIs externas de registro</li>
- *   <li>Delegar processamento de negócio ao serviço {@link Execute}</li>
- *   <li>Retornar respostas HTTP adequadas conforme resultado das operações</li>
- * </ul>
- * 
- * @author devmarlon2006
- * @version 1.0
- * @since 2024
- */
+
 @RestController
 @RequestMapping("DataSave")
 public class ClientController {
@@ -77,12 +56,12 @@ public class ClientController {
             return ResponseEntity.status( 503 ).body( HttpStatus.SERVICE_UNAVAILABLE );
         }
 
-        MessageContainer<?,?> a =  executeClient.ProcessClientRegistration( client );
+        MessageContainer<?,?> registrationResponse =  executeClient.ProcessClientRegistration( client );
 
-        if (a.getReponse().equals("error")){
+        if (registrationResponse.getReponse().equals("error")){
             return ResponseEntity.status( 400 ).body( "Error" );
         }
 
-        return ResponseEntity.status( 200 ).body( a);
+        return ResponseEntity.status( 200 ).body( registrationResponse);
     }
 }

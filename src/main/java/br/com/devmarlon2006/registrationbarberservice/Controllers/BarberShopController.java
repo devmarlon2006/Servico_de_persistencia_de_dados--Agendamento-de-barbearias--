@@ -29,7 +29,7 @@ public class BarberShopController {
         try {
             testConectivity.TestConectionData();
         }catch (ConnectionDestroyed e){
-            return ResponseEntity.status( 400 ).body( new MessageContainer<>(e.getMessage()));
+            return ResponseEntity.status( 400 ).body( HttpStatus.BAD_REQUEST);
         }
 
         if (testConectivity.TestConection( "teste" ) == ResponseMessages.WARNING){
@@ -38,7 +38,7 @@ public class BarberShopController {
 
         }
 
-        MessageContainer<?, ?> message = barberShopService.processBarberShopRegistration( barberShopDTO );
-        return ResponseEntity.status( 200 ).body( message );
+        MessageContainer<?, ?> registrationResponse = barberShopService.processBarberShopRegistration( barberShopDTO );
+        return ResponseEntity.status( HttpStatus.CREATED ).body( registrationResponse );
     }
 }

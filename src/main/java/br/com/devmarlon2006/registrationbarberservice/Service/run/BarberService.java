@@ -3,6 +3,7 @@ package br.com.devmarlon2006.registrationbarberservice.Service.run;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.MesagerComplements;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.MessageContainer;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseMessages;
+import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.StatusOperation;
 import br.com.devmarlon2006.registrationbarberservice.Service.connectionmodule.TestConectivity;
 import br.com.devmarlon2006.registrationbarberservice.Service.manager.repositorymanager.BarberRepositoryManagerService;
 import br.com.devmarlon2006.registrationbarberservice.Service.model.Barber;
@@ -19,13 +20,10 @@ import java.util.List;
 public class BarberService {
 
     private final BarberRepositoryManagerService managerBarber;
-    private final Execute execute;
     private final TestConectivity test;
 
-    public BarberService(BarberRepositoryManagerService managerBarber,
-                         Execute execute, TestConectivity test) {
+    public BarberService(BarberRepositoryManagerService managerBarber, TestConectivity test) {
         this.managerBarber = managerBarber;
-        this.execute = execute;
         this.test = test;
     }
 
@@ -43,13 +41,11 @@ public class BarberService {
      * @return MessageContainer contendo status da operação e mensagens de log
      */
     @NonNull
-    public MessageContainer<MesagerComplements<?>, String> ProcessBarberRegistration(DataTransferObject barberDTO){
-        MessageContainer<MesagerComplements<?> ,String> barberMessageContainer = new MessageContainer<>();
+    public MessageContainer<MesagerComplements, String> ProcessBarberRegistration(DataTransferObject barberDTO){
+        MessageContainer<MesagerComplements ,String> barberMessageContainer = new MessageContainer<>();
         List<ResponseMessages> list = new ArrayList<>();
 
-
         Barber barber = (Barber) barberDTO.requiredType( Barber.class);
-        
         // Teste de conectividade - operação crítica que bloqueia o fluxo em caso de falha
         try{
 
@@ -57,44 +53,32 @@ public class BarberService {
 
             if (statusOperation.equals(ResponseMessages.SUCCESS)){
 
-                barberMessageContainer.addResponse("Success");
-                barberMessageContainer.addMesage( barberMessageContainer.newAresponseComplements(
-                        ResponseMessages.SUCCESS, "Success" ), 0 );
 
             }
 
         }catch (ConnectionDestroyed e){
-            barberMessageContainer.addResponse("Error");
 
-            barberMessageContainer.addMesage(
-                    barberMessageContainer.newAresponseComplements(
-                            ResponseMessages.ERROR, "Erro fatal inesperado - ID Erro: Br20"), 0);
-
-            return barberMessageContainer;
+            return new MessageContainer<>(ResponseMessages.ERROR.getResponseMessage(), new
+                    MesagerComplements(ResponseMessages.ERROR , StatusOperation.ERROR_UNEXPECTED ,
+                    StatusOperation.ERROR_DB_CONNECTION.getFormattedMessage( e.getMessage() )));
 
         }
 
         try{
             // Validação de tipo - garante que a entidade seja uma instância válida de Barber
             if(!(managerBarber.isInstance( barber.getClass() ))){
-                Validation.ClearObject(barber);
-
-                barberMessageContainer.addMesage(
-                        barberMessageContainer.newAresponseComplements(
-                                ResponseMessages.WARNING, "Objeto invalido"), 0);
-
-                return barberMessageContainer;
+                return new MessageContainer<>( ResponseMessages.ERROR.getResponseMessage(),
+                        new MesagerComplements(ResponseMessages.ERROR , StatusOperation.ERROR_UNEXPECTED,
+                                StatusOperation.ERROR_VALIDATION_FAILED.getFormattedMessage( "Barber" )));
             }
 
             barber.DeafullScore();
-            MesagerComplements<?> operationResult = managerBarber.postOnRepository(barber);
+            MesagerComplements operationResult = managerBarber.postOnRepository(barber);
             barberMessageContainer.addMesage(operationResult, 1);
 
         }catch (NullPointerException e) {
 
-            barberMessageContainer.addMesage(
-                    barberMessageContainer.newAresponseComplements(
-                            ResponseMessages.ERROR, "Fatal Error"), 0);
+           return new MessageContainer<>();
 
         }
 
@@ -108,7 +92,9 @@ public class BarberService {
             barberMessageContainer.setReponse("Error");
         }
 
-        return barberMessageContainer;
+        MesagerComplements message = new MesagerComplements();
+        message.Success();
+        return new MessageContainer<>(ResponseMessages.ERROR.getResponseMessage(), message);
     }
 
 }
