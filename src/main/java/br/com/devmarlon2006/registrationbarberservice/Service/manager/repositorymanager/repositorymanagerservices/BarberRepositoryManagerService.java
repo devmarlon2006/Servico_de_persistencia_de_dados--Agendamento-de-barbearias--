@@ -8,14 +8,14 @@
  * Agradeço sua compreensão.
  */
 
-package br.com.devmarlon2006.registrationbarberservice.Service.manager.repositorymanager;
+package br.com.devmarlon2006.registrationbarberservice.Service.manager.repositorymanager.repositorymanagerservices;
 
 import br.com.devmarlon2006.registrationbarberservice.Repository.BarberRepository;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.MesagerComplements;
-import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.StatusOperation;
-import br.com.devmarlon2006.registrationbarberservice.Service.manager.supersmanagers.SuperRepositoryManager;
-import br.com.devmarlon2006.registrationbarberservice.Service.model.Barber;
-import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseMessages;
+import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.OperationStatusCode;
+import br.com.devmarlon2006.registrationbarberservice.Service.manager.repositorymanager.BaseManagerRepository.BaseRepositoryManager;
+import br.com.devmarlon2006.registrationbarberservice.Service.model.barber.Barber;
+import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseStatus;
 import br.com.devmarlon2006.registrationbarberservice.Service.verificationservices.Validation;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +24,7 @@ import java.util.List;
 
 
 @Service
-public class BarberRepositoryManagerService implements SuperRepositoryManager<Barber,String> {
+public class BarberRepositoryManagerService extends BaseRepositoryManager<Barber> {
 
     private final BarberRepository barberRepository;
 
@@ -36,13 +36,13 @@ public class BarberRepositoryManagerService implements SuperRepositoryManager<Ba
     public MesagerComplements postOnRepository(Barber barberRecord) {
         try{
 
-            if (repositoryGET( barberRecord, TypeOfReturn.NEGATIVE ) == ResponseMessages.WARNING){
-               return new MesagerComplements( ResponseMessages.ERROR , StatusOperation.ERROR_VALIDATION_FAILED );
+            if (repositoryGET( barberRecord, TypeOfReturn.NEGATIVE ) == ResponseStatus.WARNING){
+               return new MesagerComplements( ResponseStatus.ERROR , OperationStatusCode.ERROR_VALIDATION_FAILED );
             }
 
         }catch (NullPointerException e){
 
-           return new MesagerComplements(ResponseMessages.ERROR, StatusOperation.ERROR_UNEXPECTED);
+           return new MesagerComplements( ResponseStatus.ERROR, OperationStatusCode.ERROR_UNEXPECTED);
 
         }
 
@@ -51,43 +51,38 @@ public class BarberRepositoryManagerService implements SuperRepositoryManager<Ba
             try{
                 barberRepository.save(barberRecord);
             }catch (Exception e){
-               return new MesagerComplements(ResponseMessages.ERROR, StatusOperation.ERROR_UNEXPECTED);
+               return new MesagerComplements( ResponseStatus.ERROR, OperationStatusCode.ERROR_UNEXPECTED);
             }
 
         }else {
-            return new MesagerComplements(ResponseMessages.ERROR, StatusOperation.ERROR_VALIDATION_FAILED) ;
+            return new MesagerComplements( ResponseStatus.ERROR, OperationStatusCode.ERROR_VALIDATION_FAILED) ;
         }
 
-        return new MesagerComplements(ResponseMessages.SUCCESS, StatusOperation.SUCCESS_ENTITY_CREATED) ;
+        return new MesagerComplements( ResponseStatus.SUCCESS, OperationStatusCode.SUCCESS_ENTITY_CREATED) ;
     }
 
     @Override
-    public ResponseMessages repositoryGET(Barber barber, TypeOfReturn typeOfReturn){
+    public ResponseStatus repositoryGET(Barber barber, TypeOfReturn typeOfReturn){
         if( barberRepository.existsById(barber.getId()) || barberRepository.existsByEmail(barber.getEmail()))
         {
             return switch (typeOfReturn){
-                case POSITIVE -> ResponseMessages.SUCCESS;
-                case NEGATIVE -> ResponseMessages.WARNING;
+                case POSITIVE -> ResponseStatus.SUCCESS;
+                case NEGATIVE -> ResponseStatus.WARNING;
             };
         }
-       return ResponseMessages.SUCCESS;
+       return ResponseStatus.SUCCESS;
     }
 
     public boolean validateAtribiutesFormat(Barber barber){
         List<Boolean> list = new ArrayList<>();
 
-        list.add( Validation.NameIsCorrect( barber.getName()) );
-        list.add( Validation.EmailIsCorrect( barber.getEmail()) );
-        list.add( barber.getPassword() != null );
-        list.add( Validation.MatchCharacter( barber.getId()) );
+        list.add( Validation.NameIsCorrect( barber.getName()  ) || Validation.MatchCharacter( barber.getName()));
+        list.add( Validation.EmailIsCorrect( barber.getEmail()) || Validation.MatchCharacter( barber.getEmail()) );
+        list.add( Validation.MatchCharacter( barber.getId()) || Validation.PasswordIsCorrect( barber.getPassword()) );
         list.add(Validation.PhoneIsCorrect( barber.getPhone() ));
 
-        return list.stream().allMatch( Boolean::booleanValue );
-    }
 
-    @Override
-    public boolean isInstance(Class<?> obj){
-        return obj.isAssignableFrom(Barber.class);
+        return list.stream().anyMatch( Boolean::booleanValue );
     }
 
     public boolean phoneVerify (String phone) {

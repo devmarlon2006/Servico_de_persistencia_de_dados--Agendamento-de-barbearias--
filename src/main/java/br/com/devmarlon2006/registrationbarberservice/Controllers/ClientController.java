@@ -10,12 +10,11 @@
 
 package br.com.devmarlon2006.registrationbarberservice.Controllers;
 
-import br.com.devmarlon2006.registrationbarberservice.Service.model.DataTransferObject;
-import br.com.devmarlon2006.registrationbarberservice.Service.run.ClientService;
-import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseMessages;
-import br.com.devmarlon2006.registrationbarberservice.Service.model.Client;
+import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseStatus;
+import br.com.devmarlon2006.registrationbarberservice.Service.model.client.clientdtos.ClientRegistrationDTO;
+import br.com.devmarlon2006.registrationbarberservice.Service.applicationservices.ClientService;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.MessageContainer;
-import br.com.devmarlon2006.registrationbarberservice.Service.connectionmodule.TestConectivity;
+import br.com.devmarlon2006.registrationbarberservice.Service.connectionmodule.ConnectivityService;
 import br.com.devmarlon2006.registrationbarberservice.Service.systemexeptions.ConnectionDestroyed;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,34 +33,42 @@ public class ClientController {
 
     @Value( "${registration-api.configuration.user-register-url}")
     private String API_URL;
-    private final TestConectivity testConectivity;
+    private final ConnectivityService connectivityService;
     private final ClientService executeClient;
 
-    public ClientController(TestConectivity testConectivity, ClientService executeClient) {
-        this.testConectivity = testConectivity;
+    public ClientController(ConnectivityService connectivityService, ClientService executeClient) {
+        this.connectivityService = connectivityService;
         this.executeClient = executeClient;
     }
 
 
     @PostMapping("/client")
-    public ResponseEntity<?> SavClient(@NonNull @RequestBody DataTransferObject client){
-        try{
-            testConectivity.TestConectionData();
-        }catch (ConnectionDestroyed e){
-            return ResponseEntity.status( 400 ).body( new MessageContainer<>(e.getMessage()));
+    public ResponseEntity<?> SavClient(@NonNull @RequestBody ClientRegistrationDTO client){
+
+        try {
+
+            try{
+                connectivityService.TestConectionData();
+            }catch (ConnectionDestroyed e){
+                return ResponseEntity.status( 400 ).body( new MessageContainer<>( "Error" , e.getMessage()));
+            }
+
+            if(connectivityService.TestConection( API_URL ) == ResponseStatus.WARNING) {
+                return ResponseEntity.status( HttpStatus.SERVICE_UNAVAILABLE ).body( "Service Unavailable" );
+            }
+
+            MessageContainer<?,?> registrationResponse =  executeClient.ProcessClientRegistration( client );
+
+            if (registrationResponse.getReponse().equals("error")){
+                return ResponseEntity.status( 400 ).body( "Error" );
+            }
+
+            return ResponseEntity.status( 200 ).body( registrationResponse);
+
+        }catch (Exception e){
+
+            return ResponseEntity.status( 400 ).body( "Erro inesperado tente novamente mais tarde" );
         }
 
-        if(testConectivity.TestConection( API_URL ) == ResponseMessages.WARNING){
-
-            return ResponseEntity.status( 503 ).body( HttpStatus.SERVICE_UNAVAILABLE );
-        }
-
-        MessageContainer<?,?> registrationResponse =  executeClient.ProcessClientRegistration( client );
-
-        if (registrationResponse.getReponse().equals("error")){
-            return ResponseEntity.status( 400 ).body( "Error" );
-        }
-
-        return ResponseEntity.status( 200 ).body( registrationResponse);
     }
 }

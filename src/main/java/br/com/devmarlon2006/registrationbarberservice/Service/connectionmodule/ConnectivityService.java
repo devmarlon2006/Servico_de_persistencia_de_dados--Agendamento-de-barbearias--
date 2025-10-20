@@ -10,7 +10,7 @@
 
 package br.com.devmarlon2006.registrationbarberservice.Service.connectionmodule;
 
-import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseMessages;
+import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseStatus;
 import br.com.devmarlon2006.registrationbarberservice.Service.systemexeptions.ConnectionDestroyed;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
@@ -21,7 +21,7 @@ import java.sql.Timestamp;
 import javax.sql.DataSource;
 
 @Service
-public class TestConectivity {
+public class ConnectivityService {
 
     private static final String EXPECTED_OK = "OK" ;
     private final DataSource dataSource;
@@ -45,7 +45,7 @@ public class TestConectivity {
      *
      * @param dataSource fonte de dados configurada para o aplicativo
      */
-    public TestConectivity (DataSource dataSource) {
+    public ConnectivityService(DataSource dataSource) {
         this.restTemplate = new RestTemplate();
         this.dataSource = dataSource;
     }
@@ -53,37 +53,37 @@ public class TestConectivity {
     /**
      * Retorna o estado de sucesso para padronização de respostas do serviço.
      *
-     * @return {@link ResponseMessages#SUCCESS}
+     * @return {@link ResponseStatus#SUCCESS}
      */
-    public ResponseMessages retrieveSuccess(){
-        return ResponseMessages.SUCCESS;
+    public ResponseStatus retrieveSuccess(){
+        return ResponseStatus.SUCCESS;
     }
 
     /**
      * Retorna o estado de aviso para padronização de respostas do serviço.
      *
-     * @return {@link ResponseMessages#WARNING}
+     * @return {@link ResponseStatus#WARNING}
      */
-    public ResponseMessages retrieveWarning(){
-        return ResponseMessages.WARNING;
+    public ResponseStatus retrieveWarning(){
+        return ResponseStatus.WARNING;
     }
 
     /**
      * Retorna o estado de erro para padronização de respostas do serviço.
      *
-     * @return {@link ResponseMessages#ERROR}
+     * @return {@link ResponseStatus#ERROR}
      */
-    public ResponseMessages retrieveError(){
-        return ResponseMessages.ERROR;
+    public ResponseStatus retrieveError(){
+        return ResponseStatus.ERROR;
     }
 
     /**
      * Retorna o estado informativo para padronização de respostas do serviço.
      *
-     * @return {@link ResponseMessages#INFO}
+     * @return {@link ResponseStatus#INFO}
      */
-    public ResponseMessages retrieveInfo(){
-        return ResponseMessages.INFO;
+    public ResponseStatus retrieveInfo(){
+        return ResponseStatus.INFO;
     }
 
 
@@ -95,23 +95,23 @@ public class TestConectivity {
      * - Espera como retorno a string literal "OK".
      *
      * Retorno:
-     * - {@link ResponseMessages#SUCCESS} quando a resposta é exatamente "OK".
-     * - {@link ResponseMessages#WARNING} quando a resposta é diferente de "OK" ou está ausente.
+     * - {@link ResponseStatus#SUCCESS} quando a resposta é exatamente "OK".
+     * - {@link ResponseStatus#WARNING} quando a resposta é diferente de "OK" ou está ausente.
      *
      * Observações:
      * - Este método não trata explicitamente exceções de rede do {@link RestTemplate} (ex.: timeouts, 4xx/5xx);
      *   tais exceções podem propagar e devem ser tratadas pelo chamador, se necessário.
      *
      * @param url endpoint a ser testado
-     * @return {@link ResponseMessages#SUCCESS} quando houver resposta "OK"; {@link ResponseMessages#WARNING} caso contrário
+     * @return {@link ResponseStatus#SUCCESS} quando houver resposta "OK"; {@link ResponseStatus#WARNING} caso contrário
      */
-    public ResponseMessages TestConection(String url){
+    public ResponseStatus TestConection(String url){
         ConectionLog log = new ConectionLog();
         log.timestamp = new Timestamp(System.currentTimeMillis());
         try{
             final String response = restTemplate.postForObject(url, log, String.class);
             return EXPECTED_OK.equals(response) ? retrieveSuccess() : retrieveWarning();
-        }catch (RestClientException e){
+        }catch (RestClientException e) {
             return retrieveWarning();
         }
     }
@@ -124,17 +124,17 @@ public class TestConectivity {
      * - Tenta abrir uma conexão (try-with-resources) e verifica se a conexão obtida não é nula.
      *
      * Retorno:
-     * - {@link ResponseMessages#SUCCESS} quando a conexão é obtida com sucesso.
-     * - {@link ResponseMessages#WARNING} quando não há exceção, mas a conexão é nula (situação improvável).
+     * - {@link ResponseStatus#SUCCESS} quando a conexão é obtida com sucesso.
+     * - {@link ResponseStatus#WARNING} quando não há exceção, mas a conexão é nula (situação improvável).
      *
      * Exceções:
      * - Em caso de falha ao obter conexão (ex.: indisponibilidade do banco, credenciais inválidas),
      *   lança {@link ConnectionDestroyed} contendo a mensagem original de {@link SQLException}.
      *
-     * @return {@link ResponseMessages#SUCCESS} se a conexão for estabelecida; {@link ResponseMessages#WARNING} caso contrário
+     * @return {@link ResponseStatus#SUCCESS} se a conexão for estabelecida; {@link ResponseStatus#WARNING} caso contrário
      * @throws ConnectionDestroyed quando ocorre erro de SQL ao tentar conectar ao banco
      */
-    public ResponseMessages TestConectionData() {
+    public ResponseStatus TestConectionData() throws ConnectionDestroyed {
         try {
             dataSource.getConnection();
         } catch (SQLException e) {

@@ -8,7 +8,7 @@
  * Agradeço sua compreensão.
  */
 
-package br.com.devmarlon2006.registrationbarberservice.Service.model;
+package br.com.devmarlon2006.registrationbarberservice.Service.model.client;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,6 +16,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -53,4 +55,8 @@ public class Client {
 
     @Column(name = "age")
     private Integer age;
+
+    public void generateId(){
+        this.id = UUID.randomUUID().toString();
+    }
 }

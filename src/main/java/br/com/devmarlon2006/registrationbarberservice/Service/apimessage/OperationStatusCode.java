@@ -1,6 +1,7 @@
 package br.com.devmarlon2006.registrationbarberservice.Service.apimessage;
 
-public enum StatusOperation {
+
+public enum OperationStatusCode {
     // ----------------------------------------------------
     // Códigos de Sucesso (Para log e rastreamento de operações bem-sucedidas)
     // ----------------------------------------------------
@@ -39,7 +40,7 @@ public enum StatusOperation {
     private final int code;
     private final String message;
 
-    StatusOperation(int code, String message) {
+    OperationStatusCode(int code, String message) {
         this.code = code;
         this.message = message;
     }

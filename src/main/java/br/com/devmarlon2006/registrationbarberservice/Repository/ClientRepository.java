@@ -10,7 +10,7 @@
 
 package br.com.devmarlon2006.registrationbarberservice.Repository;
 
-import br.com.devmarlon2006.registrationbarberservice.Service.model.Client;
+import br.com.devmarlon2006.registrationbarberservice.Service.model.client.Client;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

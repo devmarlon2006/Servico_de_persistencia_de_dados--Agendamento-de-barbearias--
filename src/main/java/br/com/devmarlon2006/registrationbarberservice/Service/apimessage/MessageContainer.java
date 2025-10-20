@@ -56,7 +56,7 @@ public class MessageContainer<T,S> {
         }
     }
 
-    public MesagerComplements newAresponseComplements(ResponseMessages responseMessages, StatusOperation currentStatus){
-        return new MesagerComplements(responseMessages, currentStatus);
+    public MesagerComplements newAresponseComplements(ResponseStatus responseStatus, OperationStatusCode currentStatus){
+        return new MesagerComplements( responseStatus, currentStatus);
     }
 }

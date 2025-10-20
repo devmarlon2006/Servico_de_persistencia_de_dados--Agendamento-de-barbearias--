@@ -1,11 +1,10 @@
 package br.com.devmarlon2006.registrationbarberservice.Controllers;
 
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.MessageContainer;
-import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseMessages;
-import br.com.devmarlon2006.registrationbarberservice.Service.connectionmodule.TestConectivity;
-import br.com.devmarlon2006.registrationbarberservice.Service.model.BarberShop;
-import br.com.devmarlon2006.registrationbarberservice.Service.model.DataTransferObject;
-import br.com.devmarlon2006.registrationbarberservice.Service.run.BarberShopService;
+import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseStatus;
+import br.com.devmarlon2006.registrationbarberservice.Service.connectionmodule.ConnectivityService;
+import br.com.devmarlon2006.registrationbarberservice.Service.model.barbershop.barbershopdtos.BarberShopRegistrationDTO;
+import br.com.devmarlon2006.registrationbarberservice.Service.applicationservices.BarberShopService;
 import br.com.devmarlon2006.registrationbarberservice.Service.systemexeptions.ConnectionDestroyed;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,29 +15,39 @@ import org.springframework.web.bind.annotation.*;
 public class BarberShopController {
 
     private final BarberShopService barberShopService;
-    private final TestConectivity testConectivity;
+    private final ConnectivityService connectivityService;
 
-    public BarberShopController(BarberShopService barberShopService, TestConectivity testConectivity) {
+    public BarberShopController(BarberShopService barberShopService, ConnectivityService connectivityService) {
         this.barberShopService = barberShopService;
-        this.testConectivity = testConectivity;
+        this.connectivityService = connectivityService;
     }
 
     @PostMapping("/BarberShop")
-    public ResponseEntity<?> SavBarberShop(@RequestBody DataTransferObject barberShopDTO){
+    public ResponseEntity<?> SavBarberShop(@RequestBody BarberShopRegistrationDTO barberShopDTO){
 
         try {
-            testConectivity.TestConectionData();
+            connectivityService.TestConectionData();
         }catch (ConnectionDestroyed e){
             return ResponseEntity.status( 400 ).body( HttpStatus.BAD_REQUEST);
         }
 
-        if (testConectivity.TestConection( "teste" ) == ResponseMessages.WARNING){
+//        if (connectivityService.TestConection( "teste" ) == ResponseStatus.WARNING){
+//
+//            return ResponseEntity.status( 503 ).body( HttpStatus.SERVICE_UNAVAILABLE );
+//
+//        }
 
-            return ResponseEntity.status( 503 ).body( HttpStatus.SERVICE_UNAVAILABLE );
+        try{
 
+            MessageContainer<?, ?> registrationResponse = barberShopService.processBarberShopRegistration( barberShopDTO );
+
+            if (registrationResponse.getReponse().equals("error")){
+                return ResponseEntity.status( 400 ).body( registrationResponse );
+            }
+
+            return ResponseEntity.status( HttpStatus.CREATED ).body( registrationResponse );
+        }catch (Exception e) {
+            return ResponseEntity.status( HttpStatus.INTERNAL_SERVER_ERROR ).body( e.getMessage() );
         }
-
-        MessageContainer<?, ?> registrationResponse = barberShopService.processBarberShopRegistration( barberShopDTO );
-        return ResponseEntity.status( HttpStatus.CREATED ).body( registrationResponse );
     }
 }

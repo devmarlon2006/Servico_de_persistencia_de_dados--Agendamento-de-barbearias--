@@ -10,7 +10,7 @@
 
 package br.com.devmarlon2006.registrationbarberservice.Service.apimessage;
 
-public enum ResponseMessages {
+public enum ResponseStatus {
 
     SUCCESS( "Sucesso"),
     ERROR( "Erro"),
@@ -19,7 +19,7 @@ public enum ResponseMessages {
 
     private final String message;
 
-    ResponseMessages(String message) {
+    ResponseStatus(String message) {
         this.message = message;
     }
 

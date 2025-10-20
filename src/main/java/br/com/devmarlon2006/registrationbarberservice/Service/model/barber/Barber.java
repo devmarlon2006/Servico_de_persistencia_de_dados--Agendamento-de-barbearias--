@@ -8,17 +8,23 @@
  * Agradeço sua compreensão.
  */
 
-package br.com.devmarlon2006.registrationbarberservice.Service.model;
+package br.com.devmarlon2006.registrationbarberservice.Service.model.barber;
 
+import br.com.devmarlon2006.registrationbarberservice.Service.model.barber.barberdto.BarberRegistrationDTO;
+import br.com.devmarlon2006.registrationbarberservice.Service.model.barbershop.barbershopdtos.BarberShopRegistrationDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.Setter;
+
+import java.util.UUID;
 
 @Entity
 @Getter
+@Setter
 @Table(name = "barber_data")
 public class Barber {
 
@@ -47,5 +53,18 @@ public class Barber {
     @JsonIgnore
     public void DeafullScore(){
         if (score == null || score < 0) score = 0;
+    }
+
+    @JsonIgnore
+    public void generateId(){
+        this.id = UUID.randomUUID().toString();
+    }
+
+    public void tranformEntity(BarberRegistrationDTO barberShopRecord) {
+        this.name = barberShopRecord.getName();
+        this.email = barberShopRecord.getEmail();
+        this.phone = barberShopRecord.getPhone();
+        this.password = barberShopRecord.getPassword();
+        this.country = barberShopRecord.getCountry();
     }
 }

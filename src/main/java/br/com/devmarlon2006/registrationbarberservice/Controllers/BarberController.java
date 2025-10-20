@@ -12,9 +12,9 @@ package br.com.devmarlon2006.registrationbarberservice.Controllers;
 
 
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.MessageContainer;
-import br.com.devmarlon2006.registrationbarberservice.Service.connectionmodule.TestConectivity;
-import br.com.devmarlon2006.registrationbarberservice.Service.model.DataTransferObject;
-import br.com.devmarlon2006.registrationbarberservice.Service.run.BarberService;
+import br.com.devmarlon2006.registrationbarberservice.Service.connectionmodule.ConnectivityService;
+import br.com.devmarlon2006.registrationbarberservice.Service.model.barber.barberdto.BarberRegistrationDTO;
+import br.com.devmarlon2006.registrationbarberservice.Service.applicationservices.BarberService;
 import br.com.devmarlon2006.registrationbarberservice.Service.systemexeptions.ConnectionDestroyed;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,20 +27,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("DataSave")
 public class BarberController {
 
-    private final TestConectivity testConectivity;
+    private final ConnectivityService connectivityService;
     private final BarberService barberService;
 
-    public BarberController(TestConectivity testConectivity, BarberService barberService) {
-        this.testConectivity = testConectivity;
+    public BarberController(ConnectivityService connectivityService, BarberService barberService) {
+        this.connectivityService = connectivityService;
         this.barberService = barberService;
     }
 
     @PostMapping("/Barber")
-    public ResponseEntity<?> SavBarber(@RequestBody DataTransferObject barberDTO){
+    public ResponseEntity<?> SavBarber(@RequestBody BarberRegistrationDTO barberDTO){
         MessageContainer<?,?> registrationResponse;
 
         try{
-            testConectivity.TestConectionData();
+            connectivityService.TestConectionData();
         }catch (ConnectionDestroyed e) {
             return ResponseEntity.status( 400 ).body( "Error" );
         }

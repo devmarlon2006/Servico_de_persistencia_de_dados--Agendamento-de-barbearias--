@@ -10,11 +10,13 @@
 
 package br.com.devmarlon2006.registrationbarberservice.Service.verificationservices;
 
-public class Validation {
+
+public class Validation  {
 
     public static boolean MatchCharacter(String value){
         return value.matches("\\d+");
     }
+
 
     public static boolean NameIsCorrect(String value){
         String regex = "^[a-zA-Z\\s]+$";
@@ -31,12 +33,9 @@ public class Validation {
         return value.matches(regex);
     }
 
-    public static boolean PasswordIsCorrect(String value){
+    public static boolean PasswordIsCorrect(String value) {
         String regex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$";
-        return value.matches(regex);
+        return value.matches( regex );
     }
 
-    public static void ClearObject(Object obj){
-        obj = null;
-    }
 }
