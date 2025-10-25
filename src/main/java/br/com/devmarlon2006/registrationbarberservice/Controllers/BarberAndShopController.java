@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("DataSave")
+@RequestMapping("${endpoints.persistence}")
 public class BarberAndShopController {
 
     private final BarberAppointmentService barberAppointmentService;
@@ -21,9 +21,9 @@ public class BarberAndShopController {
         this.barberAppointmentService = plus;
     }
 
-    @PostMapping("/ShopEBarbeiro")
+    @PostMapping("${api.entity's.barberAndShop}")
     public ResponseEntity<?> controllerShop(BarberShopWithOwnerRegistrationDTO data) {
-        MessageContainer<MesagerComplements, String> registrationResponse;
+        MessageContainer<MesagerComplements> registrationResponse;
 
         try{
             registrationResponse = barberAppointmentService.processAppointment(data);

@@ -7,7 +7,7 @@ import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.Operati
 import br.com.devmarlon2006.registrationbarberservice.Service.connectionmodule.ConnectivityService;
 import br.com.devmarlon2006.registrationbarberservice.Service.manager.repositorymanager.BaseManagerRepository.BaseRepositoryManager;
 import br.com.devmarlon2006.registrationbarberservice.Service.model.barbershop.BarberShop;
-import br.com.devmarlon2006.registrationbarberservice.Service.verificationservices.Validation;
+import br.com.devmarlon2006.registrationbarberservice.Service.verificationservices.InputValidationService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -33,11 +33,11 @@ public class BarberShopRepositoryManager extends BaseRepositoryManager<BarberSho
         try{
 
             if (repositoryGET( barberShopRecord, TypeOfReturn.NEGATIVE ).equals( ResponseStatus.WARNING ) ) {
-                return new MesagerComplements( ResponseStatus.ERROR, OperationStatusCode.ERROR_UNIQUE_CONSTRAINT);
+                return new MesagerComplements( ResponseStatus.ERROR, OperationStatusCode.ERROR_UNIQUE_CONSTRAINT.getFormattedMessage( "BarberShop" ));
             }
 
         }catch (NullPointerException e){
-            return new MesagerComplements( ResponseStatus.ERROR, OperationStatusCode.ERROR_UNEXPECTED);
+            return new MesagerComplements( ResponseStatus.ERROR, OperationStatusCode.ERROR_UNEXPECTED.getFormattedMessage( e.getMessage() ));
         }
 
         if (barberShopRecord.getId() != null || barberShopRecord.getOwnerId() != null){
@@ -48,12 +48,14 @@ public class BarberShopRepositoryManager extends BaseRepositoryManager<BarberSho
                 barberShopRepository.save(barberShopRecord);
 
             } catch (Exception e) {
-               return new MesagerComplements( ResponseStatus.ERROR, OperationStatusCode.ERROR_UNEXPECTED);
+
+               return new MesagerComplements( ResponseStatus.ERROR, OperationStatusCode.ERROR_UNEXPECTED.getFormattedMessage( "Erro interno tente novamente mais tarde" ));
+
             }
 
         }
 
-        return new MesagerComplements( ResponseStatus.SUCCESS, OperationStatusCode.SUCCESS_ENTITY_CREATED);
+        return new MesagerComplements( ResponseStatus.SUCCESS, OperationStatusCode.SUCCESS_ENTITY_CREATED.getFormattedMessage( "Usuario registrado com sucesso" ));
 
     }
 
@@ -74,12 +76,12 @@ public class BarberShopRepositoryManager extends BaseRepositoryManager<BarberSho
 
 
     @Override
-    public boolean validateAtribiutesFormat(BarberShop barberShop){
+    public boolean validateAtributesInputs(BarberShop barberShop){
         List<Boolean> list = new ArrayList<>();
 
-        list.add( Validation.NameIsCorrect( barberShop.getName() ) );
-        list.add( Validation.MatchCharacter( barberShop.getId() ) );
-        list.add( Validation.PhoneIsCorrect( barberShop.getPhone() ) );
+        list.add( InputValidationService.NameIsCorrect( barberShop.getName() ) );
+        list.add( InputValidationService.MatchCharacter( barberShop.getId() ) );
+        list.add( InputValidationService.PhoneIsCorrect( barberShop.getPhone() ) );
 
         return list.stream().allMatch( Boolean::booleanValue );
     }

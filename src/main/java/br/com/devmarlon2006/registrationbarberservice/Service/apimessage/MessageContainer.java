@@ -20,9 +20,9 @@ import java.util.List;
 
 @Getter
 @Setter
-public class MessageContainer<T,S> {
-    private final Timestamp Data_Da_Operacao = Timestamp.from( Instant.now());
+public class MessageContainer<T> {
     private String reponse;
+    private final Timestamp Data_Da_Operacao = Timestamp.from( Instant.now());
     private List<T> ResponseComplements; // Codigo ou mensagem de erro
 
     public MessageContainer(String response,T message) {
@@ -46,6 +46,10 @@ public class MessageContainer<T,S> {
         this.ResponseComplements.add(body);
     }
 
+    public void addList (List<T> list){
+        this.ResponseComplements = list;
+    }
+
     public void addResponse(String response){
         this.reponse = response;
     }
@@ -56,7 +60,7 @@ public class MessageContainer<T,S> {
         }
     }
 
-    public MesagerComplements newAresponseComplements(ResponseStatus responseStatus, OperationStatusCode currentStatus){
-        return new MesagerComplements( responseStatus, currentStatus);
+    public static <T> MessageContainer<T> of(){
+        return new MessageContainer<>();
     }
 }

@@ -12,10 +12,10 @@ package br.com.devmarlon2006.registrationbarberservice.Service.apimessage;
 
 public enum ResponseStatus {
 
-    SUCCESS( "Sucesso"),
-    ERROR( "Erro"),
-    WARNING("Warning"),
-    INFO("Info");
+    SUCCESS( "Sucesso na operação" ),
+    ERROR( "Erro na operação" ),
+    WARNING( "Warning" ),
+    INFO( "Info" );
 
     private final String message;
 
@@ -23,7 +23,11 @@ public enum ResponseStatus {
         this.message = message;
     }
 
-    public String getResponseMessage(){
+    public String getResponseMessage() {
         return message;
+    }
+
+    public String formatMessage(String Detail) {
+        return this.message + ": " + message;
     }
 }

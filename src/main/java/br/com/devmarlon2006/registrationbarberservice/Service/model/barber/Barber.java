@@ -67,4 +67,8 @@ public class Barber {
         this.password = barberShopRecord.getPassword();
         this.country = barberShopRecord.getCountry();
     }
+
+    public static Barber of () {
+        return new Barber();
+    }
 }

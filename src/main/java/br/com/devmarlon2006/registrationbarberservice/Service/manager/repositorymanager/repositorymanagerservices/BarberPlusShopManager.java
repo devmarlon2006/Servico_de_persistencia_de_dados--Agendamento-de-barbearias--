@@ -20,13 +20,7 @@ public class BarberPlusShopManager {
         this.barberRepositoryManagerService = barberRepositoryManagerService;
     }
 
-    public MesagerComplements processBarberPlusShop(BarberShopWithOwnerRegistrationDTO barberShopRecord) {
-        Barber barber = new Barber();
-        barber.tranformEntity( barberShopRecord.getOwnerId() );
-        barber.generateId();
-
-        BarberShop barberShop = new BarberShop();
-        barberShop.generateId();
+    public MesagerComplements processBarberPlusShop(Barber barber , BarberShop barberShop) {
         MesagerComplements Operation = barberRepositoryManagerService.postOnRepository( barber );
 
         if (Operation.getStatus() == ResponseStatus.ERROR)
@@ -37,19 +31,19 @@ public class BarberPlusShopManager {
         barber = barberRepositoryManagerService.fyndBarber( barber.getId() );
 
         if (barber == null) {
-            return new MesagerComplements( ResponseStatus.ERROR, OperationStatusCode.ERROR_ENTITY_NOT_FOUND);
+            return new MesagerComplements( ResponseStatus.ERROR, OperationStatusCode.ERROR_ENTITY_NOT_FOUND.getMessage());
         }
 
         try{
             barberShop.setOwnerId( barber );
         }catch (NullPointerException e){
-            return new MesagerComplements( ResponseStatus.ERROR, OperationStatusCode.ERROR_UNEXPECTED);
+            return new MesagerComplements( ResponseStatus.ERROR, OperationStatusCode.ERROR_UNEXPECTED.getMessage());
         }
 
         MesagerComplements operation =
         barberShopRepositoryManager.postOnRepository( barberShop);
 
-        return new MesagerComplements( ResponseStatus.SUCCESS, OperationStatusCode.SUCCESS_ENTITY_CREATED,
-                OperationStatusCode.SUCCESS_ENTITY_CREATED.getFormattedMessage(operation.getMessageResponse()) );
+        return new MesagerComplements( ResponseStatus.SUCCESS,
+                OperationStatusCode.SUCCESS_ENTITY_CREATED.getFormattedMessage(operation.getMessage()) );
     }
 }

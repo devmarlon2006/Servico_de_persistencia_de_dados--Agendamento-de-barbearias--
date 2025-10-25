@@ -2,10 +2,14 @@ package br.com.devmarlon2006.registrationbarberservice.Service.verificationservi
 
 public interface ObjectVeryfy <S> {
 
+    /**
+     * <div> (S) -> Entity type  </div>
+     */
+
     default boolean isInstance(Class<?> Classe ,  S obj){
         return obj.getClass().isAssignableFrom(Classe);
     }
 
-    boolean validateAtribiutesFormat(S s);
+    boolean validateAtributesInputs(S s);
 
 }

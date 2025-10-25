@@ -2,7 +2,9 @@ package br.com.devmarlon2006.registrationbarberservice.Service.model.barbershop;
 
 import br.com.devmarlon2006.registrationbarberservice.Service.model.barber.Barber;
 import br.com.devmarlon2006.registrationbarberservice.Service.model.barbershop.barbershopdtos.BarberShopRegistrationDTO;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,6 +25,7 @@ public class BarberShop {
     private Barber ownerId;
 
     @Column(name = "nome_barbearia")
+    @NotBlank(message = " Campo obrigatorio: nome " )
     private String name;
 
     @Column(name = "telefone")
@@ -60,6 +63,10 @@ public class BarberShop {
         this.closeTime = barberShopDTO.getCloseTime();
         this.holidayTime = barberShopDTO.getHolidayTime();
         this.description = barberShopDTO.getDescription();
+    }
+
+    public static BarberShop of () {
+        return new BarberShop();
     }
 
 }

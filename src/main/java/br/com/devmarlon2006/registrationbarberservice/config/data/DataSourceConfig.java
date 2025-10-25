@@ -1,4 +1,4 @@
-package br.com.devmarlon2006.registrationbarberservice.config;
+package br.com.devmarlon2006.registrationbarberservice.config.data;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;

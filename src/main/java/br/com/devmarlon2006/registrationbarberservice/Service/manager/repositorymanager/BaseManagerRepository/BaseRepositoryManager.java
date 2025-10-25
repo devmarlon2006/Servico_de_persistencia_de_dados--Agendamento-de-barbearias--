@@ -6,10 +6,13 @@ import br.com.devmarlon2006.registrationbarberservice.Service.manager.repository
 import br.com.devmarlon2006.registrationbarberservice.Service.manager.RepositoryManagerContract.IRepositoryManager;
 
 public abstract class BaseRepositoryManager<T> implements IRepositoryManager<T> {
+
+    // (T) -> Tipo dos parametros;
+
     public abstract MesagerComplements postOnRepository(T t);
 
     public abstract ResponseStatus repositoryGET(T type , TypeOfReturn t );
 
-    public abstract boolean validateAtribiutesFormat(T t);
+    public abstract boolean validateAtributesInputs(T t);
 
 }

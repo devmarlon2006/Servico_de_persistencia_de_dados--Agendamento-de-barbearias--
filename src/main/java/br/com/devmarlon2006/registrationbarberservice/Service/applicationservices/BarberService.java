@@ -1,5 +1,6 @@
 package br.com.devmarlon2006.registrationbarberservice.Service.applicationservices;
 
+import br.com.devmarlon2006.registrationbarberservice.Repository.BarberShopRepository;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.MesagerComplements;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.MessageContainer;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseStatus;
@@ -8,22 +9,18 @@ import br.com.devmarlon2006.registrationbarberservice.Service.connectionmodule.C
 import br.com.devmarlon2006.registrationbarberservice.Service.manager.repositorymanager.repositorymanagerservices.BarberRepositoryManagerService;
 import br.com.devmarlon2006.registrationbarberservice.Service.model.barber.Barber;
 import br.com.devmarlon2006.registrationbarberservice.Service.model.barber.barberdto.BarberRegistrationDTO;
-import br.com.devmarlon2006.registrationbarberservice.Service.systemexeptions.ConnectionDestroyed;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+
 
 @Service
 public class BarberService {
 
     private final BarberRepositoryManagerService managerBarber;
-    private final ConnectivityService test;
 
-    public BarberService(BarberRepositoryManagerService managerBarber, ConnectivityService test) {
+    public BarberService(BarberRepositoryManagerService managerBarber) {
         this.managerBarber = managerBarber;
-        this.test = test;
     }
 
     /**
@@ -40,40 +37,37 @@ public class BarberService {
      * @return MessageContainer contendo status da operação e mensagens de log
      */
     @NonNull
-    public MessageContainer<MesagerComplements, String> ProcessBarberRegistration(BarberRegistrationDTO barberDTO){
-        MessageContainer<MesagerComplements ,String> barberMessageContainer = new MessageContainer<>();
+    public MessageContainer<MesagerComplements> ProcessBarberRegistration(BarberRegistrationDTO barberDTO){
 
-        Barber barber = new Barber();
+        Barber barber = Barber.of();
         barber.tranformEntity( barberDTO );
 
         try{
             // Validação de tipo - garante que a entidade seja uma instância válida de Barber
-            if(!(managerBarber.isInstance( barber.getClass() , barber ))){
+            if(!(managerBarber.isInstance( barber.getClass() , barber ))) {
+
                 return new MessageContainer<>( ResponseStatus.ERROR.getResponseMessage(),
-                        new MesagerComplements( ResponseStatus.ERROR , OperationStatusCode.ERROR_UNEXPECTED,
-                                OperationStatusCode.ERROR_VALIDATION_FAILED.getFormattedMessage( "Barber" )));
+                        new MesagerComplements( OperationStatusCode.ERROR_VALIDATION_FAILED.getFormattedMessage( "Erro interno tente novamente mais tarde" )));
+
             }
 
-            barber.DeafullScore();   barber.generateId();
-            MesagerComplements operationResult = managerBarber.postOnRepository(barber);
+            barber.generateId(); barber.DeafullScore();
+            MesagerComplements saveResponse = managerBarber.postOnRepository(barber);
 
-
-            if (operationResult.getStatus().equals(ResponseStatus.SUCCESS)) {
-                barberMessageContainer.addResponse(ResponseStatus.SUCCESS.getResponseMessage());
-                barberMessageContainer.addMesage(operationResult, 0);
-                return  barberMessageContainer;
-            }else if (operationResult.getStatus().equals(ResponseStatus.ERROR)) {
-                return new MessageContainer<>( ResponseStatus.ERROR.getResponseMessage(), operationResult );
+            if (saveResponse.getStatus().equals( ResponseStatus.ERROR)) {
+                return new MessageContainer<>( ResponseStatus.ERROR.getResponseMessage(), new MesagerComplements( saveResponse.getMessage() ) );
             }
 
-        }catch (NullPointerException e) {
+        }catch (Exception e) {
 
-           return new MessageContainer<>();
+            return new MessageContainer<>( ResponseStatus.ERROR.getResponseMessage(), new MesagerComplements(
+                    OperationStatusCode.ERROR_UNEXPECTED.getFormattedMessage( "Erro interno tente novamente mais tarde" )));
 
         }
 
-        return new MessageContainer<>( ResponseStatus.ERROR.getResponseMessage(), new MesagerComplements(ResponseStatus.ERROR ,
-                OperationStatusCode.ERROR_UNEXPECTED, OperationStatusCode.ERROR_BUSINESS_RULE.getFormattedMessage( "Barber" )));
+        return new MessageContainer<>(ResponseStatus.SUCCESS.getResponseMessage() ,
+                new MesagerComplements( OperationStatusCode.SUCCESS_ENTITY_CREATED.getFormattedMessage( "Usuario registrado com sucesso" ) ) ) ;
+
     }
 
 }

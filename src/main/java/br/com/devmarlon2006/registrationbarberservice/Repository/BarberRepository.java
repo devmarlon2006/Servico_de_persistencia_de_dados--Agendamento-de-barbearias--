@@ -11,6 +11,7 @@
 package br.com.devmarlon2006.registrationbarberservice.Repository;
 
 import br.com.devmarlon2006.registrationbarberservice.Service.model.barber.Barber;
+import jakarta.persistence.Table;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -10,8 +10,6 @@
 
 package br.com.devmarlon2006.registrationbarberservice.Service.manager.repositorymanager.repositorymanagerservices;
 
-
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +22,7 @@ import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.Mesager
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseStatus;
 import br.com.devmarlon2006.registrationbarberservice.Service.connectionmodule.ConnectivityService;
 import br.com.devmarlon2006.registrationbarberservice.Service.model.client.Client;
-import br.com.devmarlon2006.registrationbarberservice.Service.verificationservices.Validation;
+import br.com.devmarlon2006.registrationbarberservice.Service.verificationservices.InputValidationService;
 
 @Service
 public class ClientRepositoryManagerService extends BaseRepositoryManager<Client> {
@@ -38,32 +36,31 @@ public class ClientRepositoryManagerService extends BaseRepositoryManager<Client
         this.connectivityService = connectivityService;
     }
 
-
     @Override
     public MesagerComplements postOnRepository(Client ClientRecord) {
 
         try {
             if (repositoryGET( ClientRecord , TypeOfReturn.NEGATIVE ).equals( ResponseStatus.WARNING )) {
 
-                return new MesagerComplements( ResponseStatus.ERROR, OperationStatusCode.ERROR_UNIQUE_CONSTRAINT);
+                return new MesagerComplements( ResponseStatus.ERROR, OperationStatusCode.ERROR_UNIQUE_CONSTRAINT.getFormattedMessage( "Client" ));
             }
         } catch (NullPointerException e) {
-           return new MesagerComplements( ResponseStatus.ERROR, OperationStatusCode.ERROR_UNEXPECTED);
+           return new MesagerComplements( ResponseStatus.ERROR, OperationStatusCode.ERROR_UNEXPECTED.getFormattedMessage( "Erro interno tente novamente mais tarde" ));
         }
 
-        if(validateAtribiutesFormat( ClientRecord )) {
+        if(this.validateAtributesInputs( ClientRecord )) {
 
             try{
                 clientRepository.save( ClientRecord );
             }catch (Exception e){
-                return new MesagerComplements( ResponseStatus.ERROR, OperationStatusCode.ERROR_UNEXPECTED);
+                return new MesagerComplements( ResponseStatus.ERROR, OperationStatusCode.ERROR_UNEXPECTED.getFormattedMessage( "Erro interno tente novamente mais tarde" ));
             }
 
         }else {
-            return  new MesagerComplements( ResponseStatus.ERROR, OperationStatusCode.ERROR_VALIDATION_FAILED);
+            return  new MesagerComplements( ResponseStatus.ERROR, OperationStatusCode.ERROR_VALIDATION_FAILED.getFormattedMessage( "Client" ));
         }
 
-        return new MesagerComplements( ResponseStatus.SUCCESS, OperationStatusCode.SUCCESS_ENTITY_CREATED);
+        return new MesagerComplements( ResponseStatus.SUCCESS, OperationStatusCode.SUCCESS_ENTITY_CREATED.getFormattedMessage( "Usuario registrado com sucesso" ));
     }
 
     @Override
@@ -81,13 +78,13 @@ public class ClientRepositoryManagerService extends BaseRepositoryManager<Client
 
 
 
-    public boolean validateAtribiutesFormat(Client client) {
+    public boolean validateAtributesInputs(Client client) {
         List<Boolean> list = new ArrayList<>();
 
-        list.add( Validation.NameIsCorrect( client.getName() ) || Validation.MatchCharacter( client.getName() ) );
-        list.add( Validation.EmailIsCorrect( client.getEmail() ) || Validation.MatchCharacter( client.getEmail() ) );
-        list.add( Validation.PasswordIsCorrect( client.getPassword() ) || Validation.MatchCharacter( client.getPassword()) );
-        list.add( Validation.MatchCharacter( client.getId()));
+        list.add( InputValidationService.NameIsCorrect( client.getName() ) || InputValidationService.MatchCharacter( client.getName() ) );
+        list.add( InputValidationService.EmailIsCorrect( client.getEmail() ) || InputValidationService.MatchCharacter( client.getEmail() ) );
+        list.add( InputValidationService.PasswordIsCorrect( client.getPassword() ) || InputValidationService.MatchCharacter( client.getPassword()) );
+        list.add( InputValidationService.MatchCharacter( client.getId()));
 
         return list.stream().allMatch( Boolean::booleanValue );
     }

@@ -10,15 +10,12 @@
 
 package br.com.devmarlon2006.registrationbarberservice.Controllers;
 
-import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseStatus;
 import br.com.devmarlon2006.registrationbarberservice.Service.model.client.clientdtos.ClientRegistrationDTO;
 import br.com.devmarlon2006.registrationbarberservice.Service.applicationservices.ClientService;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.MessageContainer;
 import br.com.devmarlon2006.registrationbarberservice.Service.connectionmodule.ConnectivityService;
 import br.com.devmarlon2006.registrationbarberservice.Service.systemexeptions.ConnectionDestroyed;
 import lombok.NonNull;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,12 +24,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-@RequestMapping("DataSave")
+@RequestMapping("${endpoints.persistence}")
 public class ClientController {
 
-
-    @Value( "${registration-api.configuration.user-register-url}")
-    private String API_URL;
     private final ConnectivityService connectivityService;
     private final ClientService executeClient;
 
@@ -42,7 +36,7 @@ public class ClientController {
     }
 
 
-    @PostMapping("/client")
+    @PostMapping("${api.entity's.client}")
     public ResponseEntity<?> SavClient(@NonNull @RequestBody ClientRegistrationDTO client){
 
         try {
@@ -53,11 +47,7 @@ public class ClientController {
                 return ResponseEntity.status( 400 ).body( new MessageContainer<>( "Error" , e.getMessage()));
             }
 
-            if(connectivityService.TestConection( API_URL ) == ResponseStatus.WARNING) {
-                return ResponseEntity.status( HttpStatus.SERVICE_UNAVAILABLE ).body( "Service Unavailable" );
-            }
-
-            MessageContainer<?,?> registrationResponse =  executeClient.ProcessClientRegistration( client );
+            MessageContainer<?> registrationResponse =  executeClient.ProcessClientRegistration( client );
 
             if (registrationResponse.getReponse().equals("error")){
                 return ResponseEntity.status( 400 ).body( "Error" );

@@ -23,8 +23,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+
 @RestController
-@RequestMapping("DataSave")
+@RequestMapping( "${endpoints.persistence}" )
 public class BarberController {
 
     private final ConnectivityService connectivityService;
@@ -35,9 +36,9 @@ public class BarberController {
         this.barberService = barberService;
     }
 
-    @PostMapping("/Barber")
+    @PostMapping("${api.entity's.barber}")
     public ResponseEntity<?> SavBarber(@RequestBody BarberRegistrationDTO barberDTO){
-        MessageContainer<?,?> registrationResponse;
+        MessageContainer<?> registrationResponse;
 
         try{
             connectivityService.TestConectionData();

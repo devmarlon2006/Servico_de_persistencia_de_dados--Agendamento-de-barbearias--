@@ -11,7 +11,7 @@
 package br.com.devmarlon2006.registrationbarberservice.Service.verificationservices;
 
 
-public class Validation  {
+public class InputValidationService {
 
     public static boolean MatchCharacter(String value){
         return value.matches("\\d+");

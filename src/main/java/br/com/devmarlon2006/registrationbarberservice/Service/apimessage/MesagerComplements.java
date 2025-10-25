@@ -1,34 +1,25 @@
 package br.com.devmarlon2006.registrationbarberservice.Service.apimessage;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter @Setter
-@NoArgsConstructor
+@NoArgsConstructor(staticName = "private")
 public class MesagerComplements {
+
+    @JsonIgnore
     private ResponseStatus status;
-    private OperationStatusCode message;
-    private String messageResponse;
 
-    public MesagerComplements(ResponseStatus status, OperationStatusCode message){
-        this.status = status;
+    private String message;
+
+    public MesagerComplements( ResponseStatus Status , String message) {
+        this.status = Status;
         this.message = message;
     }
 
-    public MesagerComplements(ResponseStatus status, OperationStatusCode message, String messageResponse){
-        this.status = status;
+    public MesagerComplements( String message) {
         this.message = message;
-        this.messageResponse = messageResponse;
-    }
-
-    public boolean isSuccess(){
-        return  this.status == ResponseStatus.SUCCESS;
-    }
-
-    public void Success(){
-        this.status = ResponseStatus.SUCCESS;
-        this.message = OperationStatusCode.SUCESS_EXPECTED;
-        this.messageResponse = OperationStatusCode.SUCESS_EXPECTED.getFormattedMessage( OperationStatusCode.SUCESS_EXPECTED.getMessage() );
     }
 }

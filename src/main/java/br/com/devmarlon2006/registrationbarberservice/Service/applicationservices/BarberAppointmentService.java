@@ -5,6 +5,8 @@ import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.Message
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseStatus;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.OperationStatusCode;
 import br.com.devmarlon2006.registrationbarberservice.Service.manager.repositorymanager.repositorymanagerservices.BarberPlusShopManager;
+import br.com.devmarlon2006.registrationbarberservice.Service.model.barber.Barber;
+import br.com.devmarlon2006.registrationbarberservice.Service.model.barbershop.BarberShop;
 import br.com.devmarlon2006.registrationbarberservice.Service.model.barbershop.barbershopdtos.BarberShopWithOwnerRegistrationDTO;
 import org.springframework.stereotype.Service;
 
@@ -18,24 +20,29 @@ public class BarberAppointmentService {
         this.barberPlusShopManager = barberPlusShopManager;
     }
 
-    public MessageContainer<MesagerComplements,String> processAppointment(BarberShopWithOwnerRegistrationDTO data) {
+    public MessageContainer<MesagerComplements> processAppointment(BarberShopWithOwnerRegistrationDTO barberShopRecord) {
 
-        MessageContainer<MesagerComplements, String> container = new MessageContainer<>();
+        Barber barber = new Barber();
+        barber.tranformEntity( barberShopRecord.getOwnerId() );
+        barber.generateId();
+
+        BarberShop barberShop = new BarberShop();
+        barberShop.generateId();
+
         MesagerComplements message;
 
         try{
 
-            message = barberPlusShopManager.processBarberPlusShop(data);
-            container.addMesage( message, 0 );
+            message = barberPlusShopManager.processBarberPlusShop(barber, barberShop);
 
         }catch (NullPointerException e){
 
-            return new MessageContainer<>( ResponseStatus.ERROR.getResponseMessage(),
-                    new MesagerComplements( ResponseStatus.ERROR , OperationStatusCode.ERROR_UNEXPECTED ,
-                    OperationStatusCode.ERROR_BUSINESS_RULE.getFormattedMessage( e.getMessage()) ));
+            return new MessageContainer<>( ResponseStatus.ERROR.formatMessage( "Erro inesperado" ),
+                    new MesagerComplements( OperationStatusCode.ERROR_UNEXPECTED.getFormattedMessage( "Erro inesperado" )));
 
         }
 
-        return container;
+        return new MessageContainer<>( ResponseStatus.SUCCESS.formatMessage( "Entidade persistida" ),
+                new MesagerComplements( ResponseStatus.SUCCESS.formatMessage( "  " ) ));
     }
 }

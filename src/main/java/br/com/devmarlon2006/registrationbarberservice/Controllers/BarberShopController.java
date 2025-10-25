@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("DataSave")
+@RequestMapping("${endpoints.persistence}")
 public class BarberShopController {
 
     private final BarberShopService barberShopService;
@@ -22,7 +22,7 @@ public class BarberShopController {
         this.connectivityService = connectivityService;
     }
 
-    @PostMapping("/BarberShop")
+    @PostMapping("${api.entity's.barberShop}")
     public ResponseEntity<?> SavBarberShop(@RequestBody BarberShopRegistrationDTO barberShopDTO){
 
         try {
@@ -31,15 +31,9 @@ public class BarberShopController {
             return ResponseEntity.status( 400 ).body( HttpStatus.BAD_REQUEST);
         }
 
-//        if (connectivityService.TestConection( "teste" ) == ResponseStatus.WARNING){
-//
-//            return ResponseEntity.status( 503 ).body( HttpStatus.SERVICE_UNAVAILABLE );
-//
-//        }
-
         try{
 
-            MessageContainer<?, ?> registrationResponse = barberShopService.processBarberShopRegistration( barberShopDTO );
+            MessageContainer<?> registrationResponse = barberShopService.processBarberShopRegistration( barberShopDTO );
 
             if (registrationResponse.getReponse().equals("error")){
                 return ResponseEntity.status( 400 ).body( registrationResponse );

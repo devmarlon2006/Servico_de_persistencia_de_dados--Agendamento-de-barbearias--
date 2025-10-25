@@ -16,7 +16,7 @@ import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.Operati
 import br.com.devmarlon2006.registrationbarberservice.Service.manager.repositorymanager.BaseManagerRepository.BaseRepositoryManager;
 import br.com.devmarlon2006.registrationbarberservice.Service.model.barber.Barber;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseStatus;
-import br.com.devmarlon2006.registrationbarberservice.Service.verificationservices.Validation;
+import br.com.devmarlon2006.registrationbarberservice.Service.verificationservices.InputValidationService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -37,28 +37,31 @@ public class BarberRepositoryManagerService extends BaseRepositoryManager<Barber
         try{
 
             if (repositoryGET( barberRecord, TypeOfReturn.NEGATIVE ) == ResponseStatus.WARNING){
-               return new MesagerComplements( ResponseStatus.ERROR , OperationStatusCode.ERROR_VALIDATION_FAILED );
+               return new MesagerComplements( ResponseStatus.ERROR , OperationStatusCode.ERROR_VALIDATION_FAILED.getFormattedMessage( "Barber" ) );
             }
 
         }catch (NullPointerException e){
 
-           return new MesagerComplements( ResponseStatus.ERROR, OperationStatusCode.ERROR_UNEXPECTED);
+           return new MesagerComplements( ResponseStatus.ERROR, OperationStatusCode.ERROR_UNEXPECTED.getFormattedMessage( "Erro interno tente novamente mais tarde" ));
 
         }
 
-        if(validateAtribiutesFormat( barberRecord )){
+        if(this.validateAtributesInputs( barberRecord )){
 
             try{
                 barberRepository.save(barberRecord);
             }catch (Exception e){
-               return new MesagerComplements( ResponseStatus.ERROR, OperationStatusCode.ERROR_UNEXPECTED);
+               return new MesagerComplements( ResponseStatus.ERROR,
+                       OperationStatusCode.ERROR_UNEXPECTED.getFormattedMessage( "Erro interno tente novamente mais tarde" ));
             }
 
         }else {
-            return new MesagerComplements( ResponseStatus.ERROR, OperationStatusCode.ERROR_VALIDATION_FAILED) ;
+            return new MesagerComplements( ResponseStatus.ERROR,
+                    OperationStatusCode.ERROR_VALIDATION_FAILED.getFormattedMessage( "Barber" )) ;
         }
 
-        return new MesagerComplements( ResponseStatus.SUCCESS, OperationStatusCode.SUCCESS_ENTITY_CREATED) ;
+        return new MesagerComplements( ResponseStatus.SUCCESS,
+                OperationStatusCode.SUCCESS_ENTITY_CREATED.getFormattedMessage( "Usuario registrado com sucesso" )) ;
     }
 
     @Override
@@ -73,13 +76,13 @@ public class BarberRepositoryManagerService extends BaseRepositoryManager<Barber
        return ResponseStatus.SUCCESS;
     }
 
-    public boolean validateAtribiutesFormat(Barber barber){
+    public boolean validateAtributesInputs(Barber barber){
         List<Boolean> list = new ArrayList<>();
 
-        list.add( Validation.NameIsCorrect( barber.getName()  ) || Validation.MatchCharacter( barber.getName()));
-        list.add( Validation.EmailIsCorrect( barber.getEmail()) || Validation.MatchCharacter( barber.getEmail()) );
-        list.add( Validation.MatchCharacter( barber.getId()) || Validation.PasswordIsCorrect( barber.getPassword()) );
-        list.add(Validation.PhoneIsCorrect( barber.getPhone() ));
+        list.add( InputValidationService.NameIsCorrect( barber.getName()  ) || InputValidationService.MatchCharacter( barber.getName()));
+        list.add( InputValidationService.EmailIsCorrect( barber.getEmail()) || InputValidationService.MatchCharacter( barber.getEmail()) );
+        list.add( InputValidationService.MatchCharacter( barber.getId()) || InputValidationService.PasswordIsCorrect( barber.getPassword()) );
+        list.add( InputValidationService.PhoneIsCorrect( barber.getPhone() ));
 
 
         return list.stream().anyMatch( Boolean::booleanValue );

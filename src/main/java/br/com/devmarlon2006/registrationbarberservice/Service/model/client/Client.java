@@ -10,6 +10,7 @@
 
 package br.com.devmarlon2006.registrationbarberservice.Service.model.client;
 
+import br.com.devmarlon2006.registrationbarberservice.Service.model.client.clientdtos.ClientRegistrationDTO;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -58,5 +59,25 @@ public class Client {
 
     public void generateId(){
         this.id = UUID.randomUUID().toString();
+    }
+
+    public static Client of() {
+        return new Client();
+    }
+
+    public Client transformToEntity(ClientRegistrationDTO clientDTO) {
+        Client clientRecord = new Client();
+
+        try{
+
+            clientRecord.setAge( clientDTO.getAge() );clientRecord.setName( clientDTO.getName() );clientRecord.setState( clientDTO.getState() );
+            clientRecord.setCity(clientDTO.getCity());clientRecord.setHairtype( clientDTO.getHairtype() );clientRecord.setEmail( clientDTO.getEmail() );
+            clientRecord.setPassword( clientDTO.getPassword() );
+
+        }catch (NullPointerException e){
+            return null;
+        }
+
+        return clientRecord;
     }
 }
