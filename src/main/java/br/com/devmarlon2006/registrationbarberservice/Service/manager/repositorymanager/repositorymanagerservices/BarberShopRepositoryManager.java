@@ -28,7 +28,7 @@ public class BarberShopRepositoryManager extends BaseRepositoryManager<BarberSho
     }
 
     @Override
-    public MesagerComplements postOnRepository(BarberShop barberShopRecord) {
+    public MesagerComplements<String> postOnRepository(BarberShop barberShopRecord) {
 
         try{
 
@@ -49,13 +49,13 @@ public class BarberShopRepositoryManager extends BaseRepositoryManager<BarberSho
 
             } catch (Exception e) {
 
-               return new MesagerComplements( ResponseStatus.ERROR, OperationStatusCode.ERROR_UNEXPECTED.getFormattedMessage( "Erro interno tente novamente mais tarde" ));
+               return MesagerComplements.complementsComplete( ResponseStatus.ERROR, OperationStatusCode.ERROR_UNEXPECTED.getFormattedMessage( "Erro interno tente novamente mais tarde" ));
 
             }
 
         }
 
-        return new MesagerComplements( ResponseStatus.SUCCESS, OperationStatusCode.SUCCESS_ENTITY_CREATED.getFormattedMessage( "Usuario registrado com sucesso" ));
+        return MesagerComplements.complementsComplete( ResponseStatus.SUCCESS, OperationStatusCode.SUCCESS_ENTITY_CREATED.getFormattedMessage( "Usuario registrado com sucesso" ));
 
     }
 

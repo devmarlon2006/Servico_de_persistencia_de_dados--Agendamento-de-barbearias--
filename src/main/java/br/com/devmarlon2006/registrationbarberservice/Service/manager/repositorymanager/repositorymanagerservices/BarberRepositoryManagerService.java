@@ -33,16 +33,16 @@ public class BarberRepositoryManagerService extends BaseRepositoryManager<Barber
     }
 
     @Override
-    public MesagerComplements postOnRepository(Barber barberRecord) {
+    public MesagerComplements<String> postOnRepository(Barber barberRecord) {
         try{
 
             if (repositoryGET( barberRecord, TypeOfReturn.NEGATIVE ) == ResponseStatus.WARNING){
-               return new MesagerComplements( ResponseStatus.ERROR , OperationStatusCode.ERROR_VALIDATION_FAILED.getFormattedMessage( "Barber" ) );
+               return MesagerComplements.complementsComplete( ResponseStatus.ERROR , OperationStatusCode.ERROR_VALIDATION_FAILED.getFormattedMessage( "Barber" ) );
             }
 
         }catch (NullPointerException e){
 
-           return new MesagerComplements( ResponseStatus.ERROR, OperationStatusCode.ERROR_UNEXPECTED.getFormattedMessage( "Erro interno tente novamente mais tarde" ));
+           return MesagerComplements.complementsComplete( ResponseStatus.ERROR, OperationStatusCode.ERROR_UNEXPECTED.getFormattedMessage( "Erro interno tente novamente mais tarde" ));
 
         }
 
@@ -51,16 +51,16 @@ public class BarberRepositoryManagerService extends BaseRepositoryManager<Barber
             try{
                 barberRepository.save(barberRecord);
             }catch (Exception e){
-               return new MesagerComplements( ResponseStatus.ERROR,
+               return MesagerComplements.complementsComplete( ResponseStatus.ERROR,
                        OperationStatusCode.ERROR_UNEXPECTED.getFormattedMessage( "Erro interno tente novamente mais tarde" ));
             }
 
         }else {
-            return new MesagerComplements( ResponseStatus.ERROR,
+            return MesagerComplements.complementsComplete( ResponseStatus.ERROR,
                     OperationStatusCode.ERROR_VALIDATION_FAILED.getFormattedMessage( "Barber" )) ;
         }
 
-        return new MesagerComplements( ResponseStatus.SUCCESS,
+        return MesagerComplements.complementsComplete( ResponseStatus.SUCCESS,
                 OperationStatusCode.SUCCESS_ENTITY_CREATED.getFormattedMessage( "Usuario registrado com sucesso" )) ;
     }
 

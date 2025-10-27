@@ -23,7 +23,7 @@ public class BarberAndShopController {
 
     @PostMapping("${api.entity's.barberAndShop}")
     public ResponseEntity<?> controllerShop(BarberShopWithOwnerRegistrationDTO data) {
-        MessageContainer<MesagerComplements> registrationResponse;
+        MessageContainer<MesagerComplements<String>> registrationResponse;
 
         try{
             registrationResponse = barberAppointmentService.processAppointment(data);

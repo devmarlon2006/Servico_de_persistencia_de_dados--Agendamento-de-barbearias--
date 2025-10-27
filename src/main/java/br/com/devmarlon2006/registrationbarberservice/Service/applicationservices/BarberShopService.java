@@ -26,7 +26,8 @@ public class BarberShopService {
 
     private final BarberRepository barberRepository;
 
-    public BarberShopService(BarberShopRepositoryManager barberShopRepositoryManager, BarberShopRepository barberShopRepository, BarberRepository barberRepository)
+    public BarberShopService(BarberShopRepositoryManager barberShopRepositoryManager,
+                             BarberShopRepository barberShopRepository, BarberRepository barberRepository)
     {
         this.barberShopRepositoryManager = barberShopRepositoryManager;
         this.barberShopRepository = barberShopRepository;
@@ -35,7 +36,7 @@ public class BarberShopService {
 
 
     @NonNull
-    public MessageContainer<MesagerComplements> processBarberShopRegistration(BarberShopRegistrationDTO barberShopDTO) {
+    public MessageContainer<MesagerComplements<String>> processBarberShopRegistration(BarberShopRegistrationDTO barberShopDTO) {
 
         BarberShop barberShopRecord = BarberShop.of();
 
@@ -51,7 +52,7 @@ public class BarberShopService {
                 if (barberShopRepository.existsByOwnerId( barbe )) {
 
                     return new MessageContainer<>( ResponseStatus.ERROR.getResponseMessage(),
-                            new MesagerComplements( OperationStatusCode.ERROR_UNIQUE_CONSTRAINT.getFormattedMessage( "BarberShop" ) ));
+                             MesagerComplements.complementsOnlyBody( OperationStatusCode.ERROR_UNIQUE_CONSTRAINT.getMessage() ));
 
                 }
                 barberShopRecord.setOwnerId(barbe);
@@ -60,33 +61,35 @@ public class BarberShopService {
             if (barbe == null) {
 
                 return new MessageContainer<>( ResponseStatus.ERROR.getResponseMessage(),
-                        new MesagerComplements( OperationStatusCode.ERROR_ENTITY_NOT_FOUND.getMessage() ));
+                        MesagerComplements.complementsOnlyBody( OperationStatusCode.ERROR_ENTITY_NOT_FOUND.getMessage() ) );
             }
 
         }else {
 
            return new MessageContainer<>( ResponseStatus.ERROR.getResponseMessage(),
-                   new MesagerComplements( OperationStatusCode.ERROR_ENTITY_NOT_FOUND.getMessage() ));
+                   MesagerComplements.complementsOnlyBody( OperationStatusCode.ERROR_ENTITY_NOT_FOUND.getMessage() ));
 
         }
 
         try{
 
             barberShopRecord.generateId();
-            MesagerComplements saveResponse = barberShopRepositoryManager.postOnRepository(barberShopRecord);
+            MesagerComplements<String> saveResponse = barberShopRepositoryManager.postOnRepository(barberShopRecord);
 
             if (saveResponse.getStatus().equals( ResponseStatus.ERROR )) {
-                return new MessageContainer<>( ResponseStatus.ERROR.getResponseMessage(), new MesagerComplements( saveResponse.getMessage() ) );
+                return new MessageContainer<>( ResponseStatus.ERROR.getResponseMessage(), MesagerComplements.complementsOnlyBody( saveResponse.getBody() ));
             }
 
         }catch (NullPointerException e) {
 
             return new MessageContainer<>( ResponseStatus.ERROR.getResponseMessage(),
-                    new MesagerComplements(  OperationStatusCode.ERROR_UNEXPECTED.getFormattedMessage( "Erro interno tente novamente mais tarde" ) ));
+                    MesagerComplements.complementsOnlyBody(
+                            OperationStatusCode.ERROR_UNEXPECTED.getFormattedMessage( "Erro interno tente novamente mais tarde" ) ));
 
         }
 
         return new MessageContainer<>(ResponseStatus.SUCCESS.getResponseMessage() ,
-                new MesagerComplements( OperationStatusCode.SUCCESS_ENTITY_CREATED.getFormattedMessage( "Usuario registrado com sucesso" ) ));
+                MesagerComplements.complementsOnlyBody(
+                        OperationStatusCode.SUCCESS_ENTITY_CREATED.getFormattedMessage( "Usuario registrado com sucesso" ) ));
     }
 }

@@ -37,7 +37,7 @@ public class BarberService {
      * @return MessageContainer contendo status da operação e mensagens de log
      */
     @NonNull
-    public MessageContainer<MesagerComplements> ProcessBarberRegistration(BarberRegistrationDTO barberDTO){
+    public MessageContainer<MesagerComplements<String>> ProcessBarberRegistration(BarberRegistrationDTO barberDTO){
 
         Barber barber = Barber.of();
         barber.tranformEntity( barberDTO );
@@ -47,26 +47,27 @@ public class BarberService {
             if(!(managerBarber.isInstance( barber.getClass() , barber ))) {
 
                 return new MessageContainer<>( ResponseStatus.ERROR.getResponseMessage(),
-                        new MesagerComplements( OperationStatusCode.ERROR_VALIDATION_FAILED.getFormattedMessage( "Erro interno tente novamente mais tarde" )));
+                        MesagerComplements.complementsOnlyBody( OperationStatusCode.ERROR_VALIDATION_FAILED.getFormattedMessage( "Erro interno tente novamente mais tarde" )));
 
             }
 
             barber.generateId(); barber.DeafullScore();
-            MesagerComplements saveResponse = managerBarber.postOnRepository(barber);
+            MesagerComplements<String> saveResponse = managerBarber.postOnRepository(barber);
 
             if (saveResponse.getStatus().equals( ResponseStatus.ERROR)) {
-                return new MessageContainer<>( ResponseStatus.ERROR.getResponseMessage(), new MesagerComplements( saveResponse.getMessage() ) );
+                return new MessageContainer<>( ResponseStatus.ERROR.getResponseMessage(),
+                        MesagerComplements.complementsOnlyBody( saveResponse.getBody() ) );
             }
 
         }catch (Exception e) {
 
-            return new MessageContainer<>( ResponseStatus.ERROR.getResponseMessage(), new MesagerComplements(
+            return new MessageContainer<>( ResponseStatus.ERROR.getResponseMessage(), MesagerComplements.complementsOnlyBody(
                     OperationStatusCode.ERROR_UNEXPECTED.getFormattedMessage( "Erro interno tente novamente mais tarde" )));
 
         }
 
         return new MessageContainer<>(ResponseStatus.SUCCESS.getResponseMessage() ,
-                new MesagerComplements( OperationStatusCode.SUCCESS_ENTITY_CREATED.getFormattedMessage( "Usuario registrado com sucesso" ) ) ) ;
+                MesagerComplements.complementsOnlyBody( OperationStatusCode.SUCCESS_ENTITY_CREATED.getFormattedMessage( "Usuario registrado com sucesso" ) ) ) ;
 
     }
 

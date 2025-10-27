@@ -20,29 +20,33 @@ public class BarberAppointmentService {
         this.barberPlusShopManager = barberPlusShopManager;
     }
 
-    public MessageContainer<MesagerComplements> processAppointment(BarberShopWithOwnerRegistrationDTO barberShopRecord) {
+    public MessageContainer<MesagerComplements<String>> processAppointment(BarberShopWithOwnerRegistrationDTO barberShopRecord) {
 
-        Barber barber = new Barber();
+        Barber barber = Barber.of();
         barber.tranformEntity( barberShopRecord.getOwnerId() );
         barber.generateId();
 
         BarberShop barberShop = new BarberShop();
         barberShop.generateId();
 
-        MesagerComplements message;
+        MesagerComplements<String> message;
 
         try{
 
             message = barberPlusShopManager.processBarberPlusShop(barber, barberShop);
 
+            if (message.getStatus().equals( ResponseStatus.ERROR )) {
+                return new MessageContainer<>(ResponseStatus.ERROR.getResponseMessage(), MesagerComplements.complementsOnlyBody( message.getBody() ));
+            }
+
         }catch (NullPointerException e){
 
             return new MessageContainer<>( ResponseStatus.ERROR.formatMessage( "Erro inesperado" ),
-                    new MesagerComplements( OperationStatusCode.ERROR_UNEXPECTED.getFormattedMessage( "Erro inesperado" )));
+                    MesagerComplements.complementsOnlyBody( OperationStatusCode.ERROR_UNEXPECTED.getFormattedMessage( "Erro inesperado" )));
 
         }
 
-        return new MessageContainer<>( ResponseStatus.SUCCESS.formatMessage( "Entidade persistida" ),
-                new MesagerComplements( ResponseStatus.SUCCESS.formatMessage( "  " ) ));
+        return new MessageContainer<>( ResponseStatus.SUCCESS.getResponseMessage(),
+                MesagerComplements.complementsOnlyBody( ResponseStatus.SUCCESS.formatMessage( "Entidade persistida" ) ));
     }
 }

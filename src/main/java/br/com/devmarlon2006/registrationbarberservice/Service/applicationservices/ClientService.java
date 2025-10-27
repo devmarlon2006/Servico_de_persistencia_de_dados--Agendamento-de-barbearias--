@@ -26,7 +26,7 @@ public class ClientService {
     }
 
 
-    public MessageContainer<MesagerComplements> ProcessClientRegistration(@NonNull ClientRegistrationDTO clientDTO) {
+    public MessageContainer<MesagerComplements<String>> ProcessClientRegistration(@NonNull ClientRegistrationDTO clientDTO) {
 
         Client client = Client.of();
         client.transformToEntity( clientDTO );
@@ -42,27 +42,26 @@ public class ClientService {
 
         } catch (ConnectionDestroyed e) {
            return new MessageContainer<>( ResponseStatus.ERROR.getResponseMessage(),
-                   new MesagerComplements( ResponseStatus.ERROR ,
-                           OperationStatusCode.ERROR_BUSINESS_RULE.getFormattedMessage( e.getMessage() ) ) );
+                   MesagerComplements.complementsOnlyBody(
+                           OperationStatusCode.ERROR_UNEXPECTED.getFormattedMessage( "Erro interno tente novamente mais tarde" ) ));
         }
 
         try {
 
             if (!(managerClient.isInstance( client.getClass() , client ))) {
-                return new MessageContainer<>( ResponseStatus.ERROR.getResponseMessage(), new MesagerComplements(
-                        ResponseStatus.ERROR, OperationStatusCode.ERROR_VALIDATION_FAILED.getFormattedMessage( "Client" ) ) );
+                return new MessageContainer<>( ResponseStatus.ERROR.getResponseMessage(), MesagerComplements.complementsOnlyBody( OperationStatusCode.ERROR_VALIDATION_FAILED.getFormattedMessage( "Client" ) ) );
             }
 
-            MesagerComplements saveResponse = managerClient.postOnRepository( client );
+            MesagerComplements<String> saveResponse = managerClient.postOnRepository( client );
 
            if (saveResponse.getStatus().equals( ResponseStatus.ERROR )) {
-               return new MessageContainer<>( ResponseStatus.ERROR.getResponseMessage(), new MesagerComplements(
-                       ResponseStatus.ERROR, OperationStatusCode.ERROR_UNEXPECTED.getFormattedMessage( "Erro interno tente novamente mais tarde" ) ) );
+               return new MessageContainer<>( ResponseStatus.ERROR.getResponseMessage(), MesagerComplements.complementsOnlyBody(
+                       OperationStatusCode.ERROR_UNEXPECTED.getFormattedMessage( "Erro interno tente novamente mais tarde" ) ) );
            }
 
         } catch (NullPointerException e) {
-           return new MessageContainer<>( ResponseStatus.ERROR.getResponseMessage(), new MesagerComplements(
-                   ResponseStatus.ERROR, OperationStatusCode.ERROR_BUSINESS_RULE.getFormattedMessage( e.getMessage() ) ));
+           return new MessageContainer<>( ResponseStatus.ERROR.getResponseMessage(), MesagerComplements.complementsOnlyBody(
+                   OperationStatusCode.ERROR_BUSINESS_RULE.getFormattedMessage( e.getMessage() ) ));
         }
 
         return new MessageContainer<>();

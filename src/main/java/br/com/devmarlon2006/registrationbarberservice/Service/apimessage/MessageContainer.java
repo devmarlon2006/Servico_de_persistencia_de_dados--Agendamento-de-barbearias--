@@ -35,10 +35,6 @@ public class MessageContainer<T> {
         this.ResponseComplements = new ArrayList<>();
     }
 
-    public void addMesage(T body, int index) {
-        ResponseComplements.add( index,body  );
-    }
-
     public void addMessage(T body) {
         if (this.ResponseComplements == null) {
             this.ResponseComplements = new ArrayList<>();
@@ -58,9 +54,5 @@ public class MessageContainer<T> {
         if (this.ResponseComplements != null) {
             this.ResponseComplements.clear();
         }
-    }
-
-    public static <T> MessageContainer<T> of(){
-        return new MessageContainer<>();
     }
 }

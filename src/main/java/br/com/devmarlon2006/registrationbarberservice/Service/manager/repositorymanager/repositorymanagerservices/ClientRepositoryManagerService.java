@@ -37,15 +37,17 @@ public class ClientRepositoryManagerService extends BaseRepositoryManager<Client
     }
 
     @Override
-    public MesagerComplements postOnRepository(Client ClientRecord) {
+    public MesagerComplements<String> postOnRepository(Client ClientRecord) {
 
         try {
             if (repositoryGET( ClientRecord , TypeOfReturn.NEGATIVE ).equals( ResponseStatus.WARNING )) {
 
-                return new MesagerComplements( ResponseStatus.ERROR, OperationStatusCode.ERROR_UNIQUE_CONSTRAINT.getFormattedMessage( "Client" ));
+                return MesagerComplements.complementsComplete( ResponseStatus.ERROR,
+                        OperationStatusCode.ERROR_UNIQUE_CONSTRAINT.getFormattedMessage( "Client" ));
             }
         } catch (NullPointerException e) {
-           return new MesagerComplements( ResponseStatus.ERROR, OperationStatusCode.ERROR_UNEXPECTED.getFormattedMessage( "Erro interno tente novamente mais tarde" ));
+           return MesagerComplements.complementsComplete( ResponseStatus.ERROR,
+                   OperationStatusCode.ERROR_UNEXPECTED.getFormattedMessage( "Erro interno tente novamente mais tarde" ));
         }
 
         if(this.validateAtributesInputs( ClientRecord )) {
@@ -53,14 +55,17 @@ public class ClientRepositoryManagerService extends BaseRepositoryManager<Client
             try{
                 clientRepository.save( ClientRecord );
             }catch (Exception e){
-                return new MesagerComplements( ResponseStatus.ERROR, OperationStatusCode.ERROR_UNEXPECTED.getFormattedMessage( "Erro interno tente novamente mais tarde" ));
+                return MesagerComplements.complementsComplete( ResponseStatus.ERROR,
+                        OperationStatusCode.ERROR_UNEXPECTED.getFormattedMessage( "Erro interno tente novamente mais tarde" ));
             }
 
         }else {
-            return  new MesagerComplements( ResponseStatus.ERROR, OperationStatusCode.ERROR_VALIDATION_FAILED.getFormattedMessage( "Client" ));
+            return MesagerComplements.complementsComplete( ResponseStatus.ERROR,
+                    OperationStatusCode.ERROR_VALIDATION_FAILED.getFormattedMessage( "Client" ));
         }
 
-        return new MesagerComplements( ResponseStatus.SUCCESS, OperationStatusCode.SUCCESS_ENTITY_CREATED.getFormattedMessage( "Usuario registrado com sucesso" ));
+        return MesagerComplements.complementsComplete( ResponseStatus.SUCCESS,
+                OperationStatusCode.SUCCESS_ENTITY_CREATED.getFormattedMessage( "Usuario registrado com sucesso" ));
     }
 
     @Override

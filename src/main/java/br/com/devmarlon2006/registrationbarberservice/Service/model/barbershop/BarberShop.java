@@ -55,7 +55,7 @@ public class BarberShop {
         this.id = UUID.randomUUID().toString();
     }
 
-    public void transformEntity(BarberShopRegistrationDTO barberShopDTO){
+    public void transformEntity(BarberShopRegistrationDTO barberShopDTO) {
         this.name = barberShopDTO.getName();
         this.phone = barberShopDTO.getPhone();
         this.address = barberShopDTO.getAddress();

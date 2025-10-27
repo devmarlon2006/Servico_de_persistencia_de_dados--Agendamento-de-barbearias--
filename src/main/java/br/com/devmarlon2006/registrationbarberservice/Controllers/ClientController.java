@@ -49,7 +49,7 @@ public class ClientController {
 
             MessageContainer<?> registrationResponse =  executeClient.ProcessClientRegistration( client );
 
-            if (registrationResponse.getReponse().equals("error")){
+            if (registrationResponse.getReponse().equals("error")) {
                 return ResponseEntity.status( 400 ).body( "Error" );
             }
 
