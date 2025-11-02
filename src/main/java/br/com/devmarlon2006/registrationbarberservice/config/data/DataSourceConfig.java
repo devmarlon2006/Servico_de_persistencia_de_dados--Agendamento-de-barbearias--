@@ -24,7 +24,6 @@ public class DataSourceConfig {
     @Value( "${spring.datasource.driver-class-name}")
     String driverClassName;
 
-
     @Bean
     public DataSource hikaryDataSourceConfig() {
 

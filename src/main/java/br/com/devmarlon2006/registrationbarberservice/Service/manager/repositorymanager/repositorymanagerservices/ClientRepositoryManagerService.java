@@ -15,13 +15,14 @@ import java.util.List;
 
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.OperationStatusCode;
 import br.com.devmarlon2006.registrationbarberservice.Service.manager.repositorymanager.BaseManagerRepository.BaseRepositoryManager;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import br.com.devmarlon2006.registrationbarberservice.Repository.ClientRepository;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.MesagerComplements;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseStatus;
 import br.com.devmarlon2006.registrationbarberservice.Service.connectionmodule.ConnectivityService;
-import br.com.devmarlon2006.registrationbarberservice.Service.model.client.Client;
+import br.com.devmarlon2006.registrationbarberservice.model.client.Client;
 import br.com.devmarlon2006.registrationbarberservice.Service.verificationservices.InputValidationService;
 
 @Service
@@ -29,15 +30,19 @@ public class ClientRepositoryManagerService extends BaseRepositoryManager<Client
 
     private final ClientRepository clientRepository;
     private final ConnectivityService connectivityService;
+    private final PasswordEncoder encoder;
 
 
-    public ClientRepositoryManagerService(ClientRepository clientRepository, ConnectivityService connectivityService) {
+    public ClientRepositoryManagerService(ClientRepository clientRepository, ConnectivityService connectivityService, PasswordEncoder encoder) {
         this.clientRepository = clientRepository;
         this.connectivityService = connectivityService;
+        this.encoder = encoder;
     }
 
     @Override
     public MesagerComplements<String> postOnRepository(Client ClientRecord) {
+
+        ClientRecord.setPassword( encoder.encode( ClientRecord.getPassword() ) );
 
         try {
             if (repositoryGET( ClientRecord , TypeOfReturn.NEGATIVE ).equals( ResponseStatus.WARNING )) {
@@ -73,7 +78,7 @@ public class ClientRepositoryManagerService extends BaseRepositoryManager<Client
         if (clientRepository.existsById( ClientRecord.getId() ) || clientRepository.existsByEmail( ClientRecord.getEmail()) ||
                 clientRepository.existsByUsername( ClientRecord.getUsername() )) {
 
-            return switch (typeOfReturn){
+            return switch (typeOfReturn) {
                 case POSITIVE -> ResponseStatus.SUCCESS;
                 case NEGATIVE -> ResponseStatus.WARNING;
             };

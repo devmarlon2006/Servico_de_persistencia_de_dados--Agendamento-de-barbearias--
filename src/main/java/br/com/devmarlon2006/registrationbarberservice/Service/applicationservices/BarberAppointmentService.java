@@ -5,9 +5,9 @@ import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.Message
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseStatus;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.OperationStatusCode;
 import br.com.devmarlon2006.registrationbarberservice.Service.manager.repositorymanager.repositorymanagerservices.BarberPlusShopManager;
-import br.com.devmarlon2006.registrationbarberservice.Service.model.barber.Barber;
-import br.com.devmarlon2006.registrationbarberservice.Service.model.barbershop.BarberShop;
-import br.com.devmarlon2006.registrationbarberservice.Service.model.barbershop.barbershopdtos.BarberShopWithOwnerRegistrationDTO;
+import br.com.devmarlon2006.registrationbarberservice.model.barber.Barber;
+import br.com.devmarlon2006.registrationbarberservice.model.barbershop.BarberShop;
+import br.com.devmarlon2006.registrationbarberservice.model.barbershop.barbershopdtos.BarberShopWithOwnerRegistrationDTO;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,7 +23,7 @@ public class BarberAppointmentService {
     public MessageContainer<MesagerComplements<String>> processAppointment(BarberShopWithOwnerRegistrationDTO barberShopRecord) {
 
         Barber barber = Barber.of();
-        barber.tranformEntity( barberShopRecord.getOwnerId() );
+        barber.updateFromRegistration( barberShopRecord.getOwnerId() );
         barber.generateId();
 
         BarberShop barberShop = new BarberShop();
@@ -39,9 +39,9 @@ public class BarberAppointmentService {
                 return new MessageContainer<>(ResponseStatus.ERROR.getResponseMessage(), MesagerComplements.complementsOnlyBody( message.getBody() ));
             }
 
-        }catch (NullPointerException e){
+        }catch (NullPointerException e) {
 
-            return new MessageContainer<>( ResponseStatus.ERROR.formatMessage( "Erro inesperado" ),
+            return new MessageContainer<>( ResponseStatus.ERROR.getResponseMessage(),
                     MesagerComplements.complementsOnlyBody( OperationStatusCode.ERROR_UNEXPECTED.getFormattedMessage( "Erro inesperado" )));
 
         }

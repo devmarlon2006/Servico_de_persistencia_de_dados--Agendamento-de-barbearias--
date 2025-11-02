@@ -6,8 +6,8 @@ import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.Respons
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.OperationStatusCode;
 import br.com.devmarlon2006.registrationbarberservice.Service.connectionmodule.ConnectivityService;
 import br.com.devmarlon2006.registrationbarberservice.Service.manager.repositorymanager.repositorymanagerservices.ClientRepositoryManagerService;
-import br.com.devmarlon2006.registrationbarberservice.Service.model.client.Client;
-import br.com.devmarlon2006.registrationbarberservice.Service.model.client.clientdtos.ClientRegistrationDTO;
+import br.com.devmarlon2006.registrationbarberservice.model.client.Client;
+import br.com.devmarlon2006.registrationbarberservice.model.client.clientdtos.ClientRegistrationDTO;
 import br.com.devmarlon2006.registrationbarberservice.Service.systemexeptions.ConnectionDestroyed;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;

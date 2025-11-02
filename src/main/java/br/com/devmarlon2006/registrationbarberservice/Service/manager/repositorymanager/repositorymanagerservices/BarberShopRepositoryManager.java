@@ -6,7 +6,7 @@ import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.Respons
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.OperationStatusCode;
 import br.com.devmarlon2006.registrationbarberservice.Service.connectionmodule.ConnectivityService;
 import br.com.devmarlon2006.registrationbarberservice.Service.manager.repositorymanager.BaseManagerRepository.BaseRepositoryManager;
-import br.com.devmarlon2006.registrationbarberservice.Service.model.barbershop.BarberShop;
+import br.com.devmarlon2006.registrationbarberservice.model.barbershop.BarberShop;
 import br.com.devmarlon2006.registrationbarberservice.Service.verificationservices.InputValidationService;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +16,7 @@ import java.util.List;
 @Service
 public class BarberShopRepositoryManager extends BaseRepositoryManager<BarberShop> {
 
-    //Repositorys
-    private final BarberShopRepository barberShopRepository;
+    private final BarberShopRepository barberShopRepository; // Repositorio do banco de dados (BarberShop)
 
     private final ConnectivityService connectivityService;
 
@@ -33,11 +32,11 @@ public class BarberShopRepositoryManager extends BaseRepositoryManager<BarberSho
         try{
 
             if (repositoryGET( barberShopRecord, TypeOfReturn.NEGATIVE ).equals( ResponseStatus.WARNING ) ) {
-                return new MesagerComplements( ResponseStatus.ERROR, OperationStatusCode.ERROR_UNIQUE_CONSTRAINT.getFormattedMessage( "BarberShop" ));
+                return MesagerComplements.complementsComplete( ResponseStatus.ERROR, OperationStatusCode.ERROR_UNIQUE_CONSTRAINT.getFormattedMessage( "BarberShop" ));
             }
 
         }catch (NullPointerException e){
-            return new MesagerComplements( ResponseStatus.ERROR, OperationStatusCode.ERROR_UNEXPECTED.getFormattedMessage( e.getMessage() ));
+            return MesagerComplements.complementsComplete( ResponseStatus.ERROR, OperationStatusCode.ERROR_UNEXPECTED.getFormattedMessage( e.getMessage() ));
         }
 
         if (barberShopRecord.getId() != null || barberShopRecord.getOwnerId() != null){

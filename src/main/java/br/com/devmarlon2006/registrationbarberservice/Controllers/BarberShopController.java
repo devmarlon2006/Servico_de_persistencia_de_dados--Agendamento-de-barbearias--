@@ -1,9 +1,8 @@
 package br.com.devmarlon2006.registrationbarberservice.Controllers;
 
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.MessageContainer;
-import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseStatus;
 import br.com.devmarlon2006.registrationbarberservice.Service.connectionmodule.ConnectivityService;
-import br.com.devmarlon2006.registrationbarberservice.Service.model.barbershop.barbershopdtos.BarberShopRegistrationDTO;
+import br.com.devmarlon2006.registrationbarberservice.model.barbershop.barbershopdtos.BarberShopRegistrationDTO;
 import br.com.devmarlon2006.registrationbarberservice.Service.applicationservices.BarberShopService;
 import br.com.devmarlon2006.registrationbarberservice.Service.systemexeptions.ConnectionDestroyed;
 import org.springframework.http.HttpStatus;

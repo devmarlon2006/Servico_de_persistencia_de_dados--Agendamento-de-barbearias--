@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter @Setter
-@NoArgsConstructor(staticName = "private")
+@NoArgsConstructor(staticName = "public")
 public class MesagerComplements <T> {
 
     @JsonIgnore
@@ -14,19 +14,18 @@ public class MesagerComplements <T> {
 
     private T body;
 
-    public MesagerComplements( ResponseStatus Status , T body) {
+    private MesagerComplements( ResponseStatus Status , T body) {
         this.status = Status;
         this.body = body;
     }
 
-    public MesagerComplements( T body) {
+    private MesagerComplements( T body) {
         this.body = body;
     }
 
-    public MesagerComplements( ResponseStatus Status) {
+    private MesagerComplements( ResponseStatus Status) {
         this.status = Status;
     }
-
 
     /*
      * Static factory Methods

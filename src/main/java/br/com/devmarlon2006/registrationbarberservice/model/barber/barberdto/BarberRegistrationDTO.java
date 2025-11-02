@@ -1,4 +1,4 @@
-package br.com.devmarlon2006.registrationbarberservice.Service.model.barber.barberdto;
+package br.com.devmarlon2006.registrationbarberservice.model.barber.barberdto;
 
 import lombok.Data;
 
@@ -20,4 +20,5 @@ public class BarberRegistrationDTO {
     private String country;
 
     private Integer score;
+
 }

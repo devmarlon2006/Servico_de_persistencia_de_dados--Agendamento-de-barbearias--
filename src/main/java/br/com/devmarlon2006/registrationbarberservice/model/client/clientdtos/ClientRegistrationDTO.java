@@ -1,4 +1,4 @@
-package br.com.devmarlon2006.registrationbarberservice.Service.model.client.clientdtos;
+package br.com.devmarlon2006.registrationbarberservice.model.client.clientdtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

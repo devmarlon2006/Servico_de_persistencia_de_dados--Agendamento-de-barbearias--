@@ -10,13 +10,19 @@
 
 package br.com.devmarlon2006.registrationbarberservice.Repository;
 
-import br.com.devmarlon2006.registrationbarberservice.Service.model.barber.Barber;
-import jakarta.persistence.Table;
+import br.com.devmarlon2006.registrationbarberservice.model.barber.Barber;
+import br.com.devmarlon2006.registrationbarberservice.model.barbershop.BarberShop;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
 
 @Repository
 public interface BarberRepository extends JpaRepository<Barber, String> {
     boolean existsByEmail(String email);
     boolean existsByPhone(String phone);
+    boolean existsByBarbershop(BarberShop barbershop);
+    Barber findByName(String name);
+    Barber findByPhone(String phone);
+    Barber findByBarbershop(BarberShop barbershop);
+    Barber findByEmail(String email);
 }

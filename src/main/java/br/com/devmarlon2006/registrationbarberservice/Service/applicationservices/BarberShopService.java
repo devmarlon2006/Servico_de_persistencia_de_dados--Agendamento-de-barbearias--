@@ -7,9 +7,9 @@ import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.Message
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseStatus;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.OperationStatusCode;
 import br.com.devmarlon2006.registrationbarberservice.Service.manager.repositorymanager.repositorymanagerservices.BarberShopRepositoryManager;
-import br.com.devmarlon2006.registrationbarberservice.Service.model.barber.Barber;
-import br.com.devmarlon2006.registrationbarberservice.Service.model.barbershop.BarberShop;
-import br.com.devmarlon2006.registrationbarberservice.Service.model.barbershop.barbershopdtos.BarberShopRegistrationDTO;
+import br.com.devmarlon2006.registrationbarberservice.model.barber.Barber;
+import br.com.devmarlon2006.registrationbarberservice.model.barbershop.BarberShop;
+import br.com.devmarlon2006.registrationbarberservice.model.barbershop.barbershopdtos.BarberShopRegistrationDTO;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -38,13 +38,15 @@ public class BarberShopService {
     @NonNull
     public MessageContainer<MesagerComplements<String>> processBarberShopRegistration(BarberShopRegistrationDTO barberShopDTO) {
 
-        BarberShop barberShopRecord = BarberShop.of();
 
-        boolean exists = barberRepository.existsById( barberShopDTO.getOwerId()); //Busca BArber no banco de dados para verificar se existe
+
+        boolean exists = barberRepository.existsById( barberShopDTO.getOwerId().getId()); //Busca BArber no banco de dados para verificar se existe
+
+        BarberShop barberShopRecord = BarberShop.of();
 
         if (exists) {
 
-            Barber barbe = barberRepository.findById( barberShopDTO.getOwerId()).orElse( null );
+            Barber barbe = barberRepository.findById( barberShopDTO.getOwerId().getId()).orElse( null );
 
 
             if (barbe != null) {
@@ -55,11 +57,11 @@ public class BarberShopService {
                              MesagerComplements.complementsOnlyBody( OperationStatusCode.ERROR_UNIQUE_CONSTRAINT.getMessage() ));
 
                 }
+
                 barberShopRecord.setOwnerId(barbe);
             }
 
             if (barbe == null) {
-
                 return new MessageContainer<>( ResponseStatus.ERROR.getResponseMessage(),
                         MesagerComplements.complementsOnlyBody( OperationStatusCode.ERROR_ENTITY_NOT_FOUND.getMessage() ) );
             }

@@ -10,7 +10,7 @@
 
 package br.com.devmarlon2006.registrationbarberservice.Controllers;
 
-import br.com.devmarlon2006.registrationbarberservice.Service.model.client.clientdtos.ClientRegistrationDTO;
+import br.com.devmarlon2006.registrationbarberservice.model.client.clientdtos.ClientRegistrationDTO;
 import br.com.devmarlon2006.registrationbarberservice.Service.applicationservices.ClientService;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.MessageContainer;
 import br.com.devmarlon2006.registrationbarberservice.Service.connectionmodule.ConnectivityService;

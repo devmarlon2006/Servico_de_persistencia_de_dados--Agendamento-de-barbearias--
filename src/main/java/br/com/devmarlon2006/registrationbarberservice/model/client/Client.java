@@ -8,13 +8,10 @@
  * Agradeço sua compreensão.
  */
 
-package br.com.devmarlon2006.registrationbarberservice.Service.model.client;
+package br.com.devmarlon2006.registrationbarberservice.model.client;
 
-import br.com.devmarlon2006.registrationbarberservice.Service.model.client.clientdtos.ClientRegistrationDTO;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import br.com.devmarlon2006.registrationbarberservice.model.client.clientdtos.ClientRegistrationDTO;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -54,6 +51,10 @@ public class Client {
     @Column(name = "city")
     private String city;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role")
+    private ClientRole role;
+
     @Column(name = "age")
     private Integer age;
 
@@ -64,6 +65,7 @@ public class Client {
     public static Client of() {
         return new Client();
     }
+
 
     public Client transformToEntity(ClientRegistrationDTO clientDTO) {
         Client clientRecord = new Client();

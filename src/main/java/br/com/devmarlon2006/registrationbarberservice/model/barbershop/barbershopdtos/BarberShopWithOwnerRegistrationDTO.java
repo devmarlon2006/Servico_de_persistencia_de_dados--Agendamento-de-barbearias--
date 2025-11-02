@@ -1,6 +1,6 @@
-package br.com.devmarlon2006.registrationbarberservice.Service.model.barbershop.barbershopdtos;
+package br.com.devmarlon2006.registrationbarberservice.model.barbershop.barbershopdtos;
 
-import br.com.devmarlon2006.registrationbarberservice.Service.model.barber.barberdto.BarberRegistrationDTO;
+import br.com.devmarlon2006.registrationbarberservice.model.barber.barberdto.BarberRegistrationDTO;
 import lombok.Data;
 
 import java.sql.Time;

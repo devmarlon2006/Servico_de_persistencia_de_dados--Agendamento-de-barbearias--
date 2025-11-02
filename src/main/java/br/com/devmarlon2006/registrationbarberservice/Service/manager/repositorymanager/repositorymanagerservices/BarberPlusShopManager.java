@@ -3,9 +3,8 @@ package br.com.devmarlon2006.registrationbarberservice.Service.manager.repositor
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.MesagerComplements;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseStatus;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.OperationStatusCode;
-import br.com.devmarlon2006.registrationbarberservice.Service.model.barber.Barber;
-import br.com.devmarlon2006.registrationbarberservice.Service.model.barbershop.BarberShop;
-import br.com.devmarlon2006.registrationbarberservice.Service.model.barbershop.barbershopdtos.BarberShopWithOwnerRegistrationDTO;
+import br.com.devmarlon2006.registrationbarberservice.model.barber.Barber;
+import br.com.devmarlon2006.registrationbarberservice.model.barbershop.BarberShop;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,7 +20,7 @@ public class BarberPlusShopManager {
     }
 
     public MesagerComplements<String> processBarberPlusShop(Barber barber , BarberShop barberShop) {
-        MesagerComplements Operation = barberRepositoryManagerService.postOnRepository( barber );
+        MesagerComplements<String> Operation = barberRepositoryManagerService.postOnRepository( barber );
 
         if (Operation.getStatus() == ResponseStatus.ERROR)
         {
@@ -30,13 +29,17 @@ public class BarberPlusShopManager {
 
         barber = barberRepositoryManagerService.fyndBarber( barber.getId() );
 
+        if (barberRepositoryManagerService.existsBarber(barberShop)){
+            return MesagerComplements.complementsComplete( ResponseStatus.ERROR, OperationStatusCode.ERROR_UNIQUE_CONSTRAINT.getMessage() );
+        }
+
         if (barber == null) {
             return MesagerComplements.complementsComplete( ResponseStatus.ERROR, OperationStatusCode.ERROR_ENTITY_NOT_FOUND.getMessage());
         }
 
         try{
             barberShop.setOwnerId( barber );
-        }catch (NullPointerException e){
+        }catch (NullPointerException e) {
             return MesagerComplements.complementsComplete( ResponseStatus.ERROR, OperationStatusCode.ERROR_UNEXPECTED.getMessage());
         }
 

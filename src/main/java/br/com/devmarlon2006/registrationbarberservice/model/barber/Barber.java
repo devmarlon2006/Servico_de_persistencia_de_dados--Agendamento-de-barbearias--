@@ -8,15 +8,12 @@
  * Agradeço sua compreensão.
  */
 
-package br.com.devmarlon2006.registrationbarberservice.Service.model.barber;
+package br.com.devmarlon2006.registrationbarberservice.model.barber;
 
-import br.com.devmarlon2006.registrationbarberservice.Service.model.barber.barberdto.BarberRegistrationDTO;
-import br.com.devmarlon2006.registrationbarberservice.Service.model.barbershop.barbershopdtos.BarberShopRegistrationDTO;
+import br.com.devmarlon2006.registrationbarberservice.model.barber.barberdto.BarberRegistrationDTO;
+import br.com.devmarlon2006.registrationbarberservice.model.barbershop.BarberShop;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -50,9 +47,23 @@ public class Barber {
     @Column(name = "score")
     private Integer score;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role")
+    private BarberRoles role;
+
+    @OneToOne(mappedBy = "ownerId")
+    private BarberShop barbershop;
+
     @JsonIgnore
     public void DeafullScore(){
         if (score == null || score < 0) score = 0;
+    }
+
+    public void deafullRole() {
+
+        if (this.role == null) {
+            this.role = BarberRoles.BARBEIRO;
+        }
     }
 
     @JsonIgnore
@@ -60,7 +71,7 @@ public class Barber {
         this.id = UUID.randomUUID().toString();
     }
 
-    public void tranformEntity(BarberRegistrationDTO barberShopRecord) {
+    public void updateFromRegistration(BarberRegistrationDTO barberShopRecord) {
         this.name = barberShopRecord.getName();
         this.email = barberShopRecord.getEmail();
         this.phone = barberShopRecord.getPhone();

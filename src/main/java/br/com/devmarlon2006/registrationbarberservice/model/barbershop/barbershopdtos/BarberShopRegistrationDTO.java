@@ -1,5 +1,6 @@
-package br.com.devmarlon2006.registrationbarberservice.Service.model.barbershop.barbershopdtos;
+package br.com.devmarlon2006.registrationbarberservice.model.barbershop.barbershopdtos;
 
+import br.com.devmarlon2006.registrationbarberservice.model.barber.Barber;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,7 +18,7 @@ public class BarberShopRegistrationDTO {
 
     private String name;
 
-    private String owerId; //(Apenas o id do dono em formato String)
+    private Barber owerId;
 
     private String phone;
 

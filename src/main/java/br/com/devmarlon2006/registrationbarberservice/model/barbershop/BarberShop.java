@@ -1,8 +1,7 @@
-package br.com.devmarlon2006.registrationbarberservice.Service.model.barbershop;
+package br.com.devmarlon2006.registrationbarberservice.model.barbershop;
 
-import br.com.devmarlon2006.registrationbarberservice.Service.model.barber.Barber;
-import br.com.devmarlon2006.registrationbarberservice.Service.model.barbershop.barbershopdtos.BarberShopRegistrationDTO;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import br.com.devmarlon2006.registrationbarberservice.model.barber.Barber;
+import br.com.devmarlon2006.registrationbarberservice.model.barbershop.barbershopdtos.BarberShopRegistrationDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -47,12 +46,17 @@ public class BarberShop {
     private String description;
 
 
-    public String getOwerID(){
+    public String getOwerID() {
+        if (ownerId == null) throw new NullPointerException("BarberShop ownerId is null") ;
         return ownerId.getId();
     }
 
     public void generateId(){
-        this.id = UUID.randomUUID().toString();
+
+        if (this.id  == null){
+            this.id = UUID.randomUUID().toString();
+        }
+
     }
 
     public void transformEntity(BarberShopRegistrationDTO barberShopDTO) {
