@@ -86,25 +86,6 @@ public class ConnectivityService {
         return ResponseStatus.INFO;
     }
 
-
-    /**
-     * Realiza um teste de conectividade com um serviço HTTP externo.
-     *
-     * Comportamento:
-     * - Envia uma requisição POST para a URL informada contendo um {@link ConectionLog}.
-     * - Espera como retorno a string literal "OK".
-     *
-     * Retorno:
-     * - {@link ResponseStatus#SUCCESS} quando a resposta é exatamente "OK".
-     * - {@link ResponseStatus#WARNING} quando a resposta é diferente de "OK" ou está ausente.
-     *
-     * Observações:
-     * - Este método não trata explicitamente exceções de rede do {@link RestTemplate} (ex.: timeouts, 4xx/5xx);
-     *   tais exceções podem propagar e devem ser tratadas pelo chamador, se necessário.
-     *
-     * @param url endpoint a ser testado
-     * @return {@link ResponseStatus#SUCCESS} quando houver resposta "OK"; {@link ResponseStatus#WARNING} caso contrário
-     */
     public ResponseStatus TestConection(String url){
         ConectionLog log = new ConectionLog();
         log.timestamp = new Timestamp(System.currentTimeMillis());
@@ -117,25 +98,9 @@ public class ConnectivityService {
     }
 
 
-    /**
-     * Testa a conectividade com o banco de dados obtendo uma conexão do {@link DataSource}.
-     *
-     * Comportamento:
-     * - Tenta abrir uma conexão (try-with-resources) e verifica se a conexão obtida não é nula.
-     *
-     * Retorno:
-     * - {@link ResponseStatus#SUCCESS} quando a conexão é obtida com sucesso.
-     * - {@link ResponseStatus#WARNING} quando não há exceção, mas a conexão é nula (situação improvável).
-     *
-     * Exceções:
-     * - Em caso de falha ao obter conexão (ex.: indisponibilidade do banco, credenciais inválidas),
-     *   lança {@link ConnectionDestroyed} contendo a mensagem original de {@link SQLException}.
-     *
-     * @return {@link ResponseStatus#SUCCESS} se a conexão for estabelecida; {@link ResponseStatus#WARNING} caso contrário
-     * @throws ConnectionDestroyed quando ocorre erro de SQL ao tentar conectar ao banco
-     */
+
     public ResponseStatus TestConectionData() throws ConnectionDestroyed {
-        try {
+         try {
             dataSource.getConnection();
         } catch (SQLException e) {
             throw new ConnectionDestroyed( e.getMessage() );

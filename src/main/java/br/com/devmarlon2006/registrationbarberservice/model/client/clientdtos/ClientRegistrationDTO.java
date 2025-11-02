@@ -15,19 +15,17 @@ import java.util.UUID;
  * <p><strong>Nota:</strong> Esta classe não possui campo 'id' pois o identificador único
  * será gerado automaticamente por outro serviço responsável pela persistência.</p>
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class ClientRegistrationDTO {
 
-    private String username;
-    private String name;
-    private String email;
-    private String hairtype;
-    private String password;
-    private String country;
-    private String state;
-    private String city;
-    private Integer age;
+public record ClientRegistrationDTO (
 
-}
+        String username,
+        String name,
+        String email,
+        String hairtype,
+        String password,
+        String country,
+        String state,
+        String city,
+        Integer age
+
+){}

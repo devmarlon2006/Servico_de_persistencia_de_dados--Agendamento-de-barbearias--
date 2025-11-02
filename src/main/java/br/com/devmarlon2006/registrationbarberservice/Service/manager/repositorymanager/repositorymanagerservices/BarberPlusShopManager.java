@@ -20,6 +20,7 @@ public class BarberPlusShopManager {
     }
 
     public MesagerComplements<String> processBarberPlusShop(Barber barber , BarberShop barberShop) {
+
         MesagerComplements<String> Operation = barberRepositoryManagerService.postOnRepository( barber );
 
         if (Operation.getStatus() == ResponseStatus.ERROR)

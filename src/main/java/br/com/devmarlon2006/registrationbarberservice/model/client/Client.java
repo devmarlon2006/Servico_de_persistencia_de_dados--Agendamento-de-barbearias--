@@ -13,12 +13,14 @@ package br.com.devmarlon2006.registrationbarberservice.model.client;
 import br.com.devmarlon2006.registrationbarberservice.model.client.clientdtos.ClientRegistrationDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.UUID;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "clients_data")
 public class Client {
@@ -58,6 +60,20 @@ public class Client {
     @Column(name = "age")
     private Integer age;
 
+    Client(Integer age , String username , String name , String email , String password ,
+           String hairtype , String country , String state , String city) {
+
+        this.age = age;
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.hairtype = hairtype;
+        this.country = country;
+        this.state = state;
+        this.city = city;
+
+    }
+
     public void generateId(){
         this.id = UUID.randomUUID().toString();
     }
@@ -67,19 +83,19 @@ public class Client {
     }
 
 
-    public Client transformToEntity(ClientRegistrationDTO clientDTO) {
-        Client clientRecord = new Client();
+    public static Client buildFromRegistrationDTO(ClientRegistrationDTO clientDTO) {
+        return new Client(
 
-        try{
+                clientDTO.age(),
+                clientDTO.username(),
+                clientDTO.name(),
+                clientDTO.email(),
+                clientDTO.password(),
+                clientDTO.hairtype(),
+                clientDTO.country(),
+                clientDTO.state(),
+                clientDTO.city()
 
-            clientRecord.setAge( clientDTO.getAge() );clientRecord.setName( clientDTO.getName() );clientRecord.setState( clientDTO.getState() );
-            clientRecord.setCity(clientDTO.getCity());clientRecord.setHairtype( clientDTO.getHairtype() );clientRecord.setEmail( clientDTO.getEmail() );
-            clientRecord.setPassword( clientDTO.getPassword() );
-
-        }catch (NullPointerException e){
-            return null;
-        }
-
-        return clientRecord;
+        );
     }
 }

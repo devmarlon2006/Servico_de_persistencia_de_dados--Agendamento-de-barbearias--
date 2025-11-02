@@ -2,6 +2,7 @@ package br.com.devmarlon2006.registrationbarberservice.model.barbershop;
 
 import br.com.devmarlon2006.registrationbarberservice.model.barber.Barber;
 import br.com.devmarlon2006.registrationbarberservice.model.barbershop.barbershopdtos.BarberShopRegistrationDTO;
+import br.com.devmarlon2006.registrationbarberservice.model.barbershop.barbershopdtos.BarberShopWithOwnerRegistrationDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -45,6 +46,21 @@ public class BarberShop {
     @Column(name = "descricao")
     private String description;
 
+    public BarberShop() {
+    }
+
+    BarberShop(String name , String phone , String address , LocalTime openTime , LocalTime closeTime , String holidayTime , String description) {
+        this.name = name;
+        this.phone = phone;
+        this.address = address;
+        this.openTime = openTime;
+        this.closeTime = closeTime;
+        this.holidayTime = holidayTime;
+        this.description = description;
+    }
+
+
+
 
     public String getOwerID() {
         if (ownerId == null) throw new NullPointerException("BarberShop ownerId is null") ;
@@ -59,14 +75,21 @@ public class BarberShop {
 
     }
 
-    public void transformEntity(BarberShopRegistrationDTO barberShopDTO) {
-        this.name = barberShopDTO.getName();
-        this.phone = barberShopDTO.getPhone();
-        this.address = barberShopDTO.getAddress();
-        this.openTime = barberShopDTO.getOpenTime();
-        this.closeTime = barberShopDTO.getCloseTime();
-        this.holidayTime = barberShopDTO.getHolidayTime();
-        this.description = barberShopDTO.getDescription();
+    public static BarberShop buildFromRegistrationDTO(BarberShopRegistrationDTO barberShopDTO) {
+
+        return new BarberShop(
+
+                barberShopDTO.name(),
+                barberShopDTO.phone(),
+                barberShopDTO.address(),
+                barberShopDTO.openTime(),
+                barberShopDTO.closeTime(),
+                barberShopDTO.holidayTime(),
+                barberShopDTO.description()
+
+        );
+
+
     }
 
     public static BarberShop of () {

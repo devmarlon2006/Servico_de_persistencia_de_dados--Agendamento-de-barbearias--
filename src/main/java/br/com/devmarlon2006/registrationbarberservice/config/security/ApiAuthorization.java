@@ -2,8 +2,6 @@ package br.com.devmarlon2006.registrationbarberservice.config.security;
 
 import br.com.devmarlon2006.registrationbarberservice.Repository.BarberRepository;
 import br.com.devmarlon2006.registrationbarberservice.config.security.customsuserdetails.CustomBarberDetailsService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -51,33 +49,18 @@ public class ApiAuthorization {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(10); // Mais seguro que o -> MD5
+        return new BCryptPasswordEncoder(10);
     }
 
     @Bean
-    public UserDetailsService userDetailsService (BarberRepository barberRepositoryManagerService) {
+    public UserDetailsService barberDetailsService (BarberRepository barberRepositoryManagerService) {
         return new CustomBarberDetailsService( barberRepositoryManagerService );
     }
 
     @Bean
-    public CommandLineRunner testPasswordMatcher(PasswordEncoder passwordEncoder) {
-        return args -> {
-            // 1. A senha em texto puro que você está digitando no Postman
-            String rawPassword = "senha_em_texto_puro";
-
-            // 2. O HASH exato que está no seu banco de dados (copie e cole)
-            String encodedPasswordFromDB = "$2a$10$mcwNUIeTMdlj2z9S9gg1HOnrsoh8satdZPKOVZk2DNc56VAGATR6i";
-
-            boolean matches = passwordEncoder.matches(rawPassword, encodedPasswordFromDB);
-
-            System.out.println("TESTE CRÍTICO DE SENHA: O HASH CORRESPONDE? " + matches);
-        };
-    }
-
-    @Bean
-    public AuthenticationProvider authenticationProvider(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+    public AuthenticationProvider barberAuthenticationProvider(UserDetailsService barberDetailsService, PasswordEncoder passwordEncoder) {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailsService);
+        provider.setUserDetailsService(barberDetailsService);
         provider.setPasswordEncoder(passwordEncoder);
 
         // Opcional, mas útil: Forçar a verificação de existência do usuário antes de checar a senha

@@ -28,8 +28,7 @@ public class BarberService {
     @NonNull
     public MessageContainer<MesagerComplements<String>> ProcessBarberRegistration(BarberRegistrationDTO barberDTO){
 
-        Barber barber = Barber.of();
-        barber.updateFromRegistration( barberDTO );
+        Barber barber = Barber.buildFromRegistrationDTO( barberDTO );
         barber.setPassword( passwordEncoder.encode( barber.getPassword() ) );
 
         try{

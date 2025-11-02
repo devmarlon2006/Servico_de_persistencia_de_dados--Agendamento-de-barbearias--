@@ -38,15 +38,13 @@ public class BarberShopService {
     @NonNull
     public MessageContainer<MesagerComplements<String>> processBarberShopRegistration(BarberShopRegistrationDTO barberShopDTO) {
 
+        boolean exists = barberRepository.existsById( barberShopDTO.owerId().getId()); //Busca BArber no banco de dados para verificar se existe
 
-
-        boolean exists = barberRepository.existsById( barberShopDTO.getOwerId().getId()); //Busca BArber no banco de dados para verificar se existe
-
-        BarberShop barberShopRecord = BarberShop.of();
+        BarberShop barberShopRecord = BarberShop.buildFromRegistrationDTO( barberShopDTO );
 
         if (exists) {
 
-            Barber barbe = barberRepository.findById( barberShopDTO.getOwerId().getId()).orElse( null );
+            Barber barbe = barberRepository.findById( barberShopDTO.owerId().getId()).orElse( null );
 
 
             if (barbe != null) {

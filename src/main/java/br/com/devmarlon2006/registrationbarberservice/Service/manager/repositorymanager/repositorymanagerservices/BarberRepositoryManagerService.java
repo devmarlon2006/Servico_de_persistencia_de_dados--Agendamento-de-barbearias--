@@ -96,14 +96,6 @@ public class BarberRepositoryManagerService extends BaseRepositoryManager<Barber
         return barberRepository.findById(id).orElse(null); //Se não for encontrado ira retornar um valor em uma optional
     }
 
-    public Barber findName (String name) {
-        return barberRepository.findByName( name );
-    }
-
-    public Barber fyndBarberByEmail(String email){
-        return barberRepository.findByEmail(email);
-    }
-
     public Boolean existsBarber(BarberShop barberShop){
 
         if(barberRepository.existsByBarbershop( barberShop )){

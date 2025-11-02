@@ -13,22 +13,15 @@ import java.sql.Time;
  * @author devmarlon2006
  */
 
-@Data
-public class BarberShopWithOwnerRegistrationDTO {
+public record BarberShopWithOwnerRegistrationDTO (
+        String name ,
+        BarberRegistrationDTO ownerId ,
+        String phone ,
+        String address ,
+        Time openTime ,
+        Time closeTime ,
+        Time holidayTime ,
+        String description) {
 
-    private String name;
 
-    private BarberRegistrationDTO ownerId; // Dados completos do proprietário da barbearia
-
-    private String phone;
-
-    private String address;
-
-    private Time openTime;
-
-    private Time closeTime;
-
-    private Time holidayTime;
-
-    private String description;
 }

@@ -20,16 +20,14 @@ public class ClientService {
     private final ConnectivityService test;
 
     public ClientService(ClientRepositoryManagerService managerClient, ConnectivityService test) {
-
         this.managerClient = managerClient;
         this.test = test;
     }
 
-
     public MessageContainer<MesagerComplements<String>> ProcessClientRegistration(@NonNull ClientRegistrationDTO clientDTO) {
 
-        Client client = Client.of();
-        client.transformToEntity( clientDTO );
+        Client client = Client.buildFromRegistrationDTO( clientDTO );
+
 
         if (client.getId() == null) {
             client.generateId();

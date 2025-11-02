@@ -2,23 +2,16 @@ package br.com.devmarlon2006.registrationbarberservice.model.barber.barberdto;
 
 import lombok.Data;
 
-@Data
-public class BarberRegistrationDTO {
+public record BarberRegistrationDTO (
+        String name,
+        String email,
+        String phone,
+        String password,
+        String country
+) {
 
     //--------------------------------
     // * Data-transfer-object class
     //--------------------------------
-
-    private String name;
-
-    private String email;
-
-    private String phone;
-
-    private String password;
-
-    private String country;
-
-    private Integer score;
 
 }

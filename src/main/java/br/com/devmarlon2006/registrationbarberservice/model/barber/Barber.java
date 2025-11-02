@@ -55,12 +55,21 @@ public class Barber {
     private BarberShop barbershop;
 
     @JsonIgnore
-    public void DeafullScore(){
+    public void DeafullScore() {
         if (score == null || score < 0) score = 0;
     }
 
-    public void deafullRole() {
+    public Barber(){}
 
+    public Barber(String name, String email, String phone, String password, String country) {
+        this.name = name;
+        this.email = email;
+        this.phone = phone;
+        this.password = password;
+        this.country = country;
+    }
+
+    public void deafullRole() {
         if (this.role == null) {
             this.role = BarberRoles.BARBEIRO;
         }
@@ -72,11 +81,15 @@ public class Barber {
     }
 
     public void updateFromRegistration(BarberRegistrationDTO barberShopRecord) {
-        this.name = barberShopRecord.getName();
-        this.email = barberShopRecord.getEmail();
-        this.phone = barberShopRecord.getPhone();
-        this.password = barberShopRecord.getPassword();
-        this.country = barberShopRecord.getCountry();
+        this.name = barberShopRecord.name();
+        this.email = barberShopRecord.email();
+        this.phone = barberShopRecord.phone();
+        this.password = barberShopRecord.password();
+        this.country = barberShopRecord.country();
+    }
+
+    public static Barber buildFromRegistrationDTO(BarberRegistrationDTO barberDTO) {
+        return  new Barber(barberDTO.name(), barberDTO.email(), barberDTO.phone(), barberDTO.password(), barberDTO.country());
     }
 
     public static Barber of () {
