@@ -4,11 +4,11 @@ import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.Mesager
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.MessageContainer;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseStatus;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.OperationStatusCode;
+import br.com.devmarlon2006.registrationbarberservice.Service.manager.modelsassemblersmanagers.BarberAssembler;
 import br.com.devmarlon2006.registrationbarberservice.Service.manager.repositorymanager.repositorymanagerservices.BarberRepositoryManagerService;
 import br.com.devmarlon2006.registrationbarberservice.model.barber.Barber;
 import br.com.devmarlon2006.registrationbarberservice.model.barber.barberdto.BarberRegistrationDTO;
 import lombok.NonNull;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
@@ -18,30 +18,28 @@ public class BarberService {
 
     private final BarberRepositoryManagerService managerBarber;
 
-    private final PasswordEncoder passwordEncoder;
+    private final BarberAssembler barberAssembler;
 
-    public BarberService(BarberRepositoryManagerService managerBarber, PasswordEncoder passwordEncoder) {
+    public BarberService(BarberRepositoryManagerService managerBarber, BarberAssembler barberAssembler) {
         this.managerBarber = managerBarber;
-        this.passwordEncoder = passwordEncoder;
+        this.barberAssembler = barberAssembler;
     }
 
     @NonNull
     public MessageContainer<MesagerComplements<String>> ProcessBarberRegistration(BarberRegistrationDTO barberDTO){
 
-        Barber barber = Barber.buildFromRegistrationDTO( barberDTO );
-        barber.setPassword( passwordEncoder.encode( barber.getPassword() ) );
+        MesagerComplements<Barber> operationBarber = barberAssembler.barberAssembler( barberDTO );
 
         try{
             // Validação de tipo - garante que a entidade seja uma instância válida de Barber
-            if(!(managerBarber.isInstance( barber.getClass() , barber ))) {
+            if(!(managerBarber.isInstance( operationBarber.getClass() , operationBarber.getBody() ))) {
 
                 return new MessageContainer<>( ResponseStatus.ERROR.getResponseMessage(),
                         MesagerComplements.complementsOnlyBody( OperationStatusCode.ERROR_VALIDATION_FAILED.getFormattedMessage( "Erro interno tente novamente mais tarde" )));
 
             }
 
-            barber.generateId(); barber.DeafullScore();
-            MesagerComplements<String> saveResponse = managerBarber.postOnRepository(barber);
+            MesagerComplements<String> saveResponse = managerBarber.postOnRepository(operationBarber.getBody());
 
             if (saveResponse.getStatus().equals( ResponseStatus.ERROR)) {
                 return new MessageContainer<>( ResponseStatus.ERROR.getResponseMessage(),

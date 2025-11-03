@@ -6,7 +6,10 @@ import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.Mesager
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.MessageContainer;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseStatus;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.OperationStatusCode;
+import br.com.devmarlon2006.registrationbarberservice.Service.manager.modelsassemblersmanagers.BarberShopAssembler;
 import br.com.devmarlon2006.registrationbarberservice.Service.manager.repositorymanager.repositorymanagerservices.BarberShopRepositoryManager;
+import br.com.devmarlon2006.registrationbarberservice.config.security.ApiAuthorization;
+import br.com.devmarlon2006.registrationbarberservice.config.security.loginuserdetailsprovinders.BarberUserDetailsProvider;
 import br.com.devmarlon2006.registrationbarberservice.model.barber.Barber;
 import br.com.devmarlon2006.registrationbarberservice.model.barbershop.BarberShop;
 import br.com.devmarlon2006.registrationbarberservice.model.barbershop.barbershopdtos.BarberShopRegistrationDTO;
@@ -21,60 +24,32 @@ public class BarberShopService {
      * Serviços solicitados
      */
     private final BarberShopRepositoryManager barberShopRepositoryManager;
-    private final BarberShopRepository barberShopRepository;
 
+    private final BarberShopAssembler barberShopAssembler;
 
-    private final BarberRepository barberRepository;
-
-    public BarberShopService(BarberShopRepositoryManager barberShopRepositoryManager,
-                             BarberShopRepository barberShopRepository, BarberRepository barberRepository)
+    public BarberShopService(BarberShopRepositoryManager barberShopRepositoryManager, BarberShopAssembler barberShopAssembler)
     {
         this.barberShopRepositoryManager = barberShopRepositoryManager;
-        this.barberShopRepository = barberShopRepository;
-        this.barberRepository = barberRepository;
+        this.barberShopAssembler = barberShopAssembler;
     }
 
 
     @NonNull
     public MessageContainer<MesagerComplements<String>> processBarberShopRegistration(BarberShopRegistrationDTO barberShopDTO) {
 
-        boolean exists = barberRepository.existsById( barberShopDTO.owerId().getId()); //Busca BArber no banco de dados para verificar se existe
+        MesagerComplements<BarberShop> barberShopOperation = barberShopAssembler.barberShopAssembler( barberShopDTO );
 
-        BarberShop barberShopRecord = BarberShop.buildFromRegistrationDTO( barberShopDTO );
+        if (barberShopOperation.getStatus() == ResponseStatus.ERROR) {
 
-        if (exists) {
-
-            Barber barbe = barberRepository.findById( barberShopDTO.owerId().getId()).orElse( null );
-
-
-            if (barbe != null) {
-
-                if (barberShopRepository.existsByOwnerId( barbe )) {
-
-                    return new MessageContainer<>( ResponseStatus.ERROR.getResponseMessage(),
-                             MesagerComplements.complementsOnlyBody( OperationStatusCode.ERROR_UNIQUE_CONSTRAINT.getMessage() ));
-
-                }
-
-                barberShopRecord.setOwnerId(barbe);
-            }
-
-            if (barbe == null) {
-                return new MessageContainer<>( ResponseStatus.ERROR.getResponseMessage(),
-                        MesagerComplements.complementsOnlyBody( OperationStatusCode.ERROR_ENTITY_NOT_FOUND.getMessage() ) );
-            }
-
-        }else {
-
-           return new MessageContainer<>( ResponseStatus.ERROR.getResponseMessage(),
-                   MesagerComplements.complementsOnlyBody( OperationStatusCode.ERROR_ENTITY_NOT_FOUND.getMessage() ));
+            return new MessageContainer<>(barberShopOperation.getStatus().getResponseMessage() , MesagerComplements.complementsOnlyBody(
+                    OperationStatusCode.ERROR_UNEXPECTED.getFormattedMessage( "Erro interno tente novamente mais tarde" ) ));
 
         }
 
         try{
 
-            barberShopRecord.generateId();
-            MesagerComplements<String> saveResponse = barberShopRepositoryManager.postOnRepository(barberShopRecord);
+
+            MesagerComplements<String> saveResponse = barberShopRepositoryManager.postOnRepository(barberShopOperation.getBody());
 
             if (saveResponse.getStatus().equals( ResponseStatus.ERROR )) {
                 return new MessageContainer<>( ResponseStatus.ERROR.getResponseMessage(), MesagerComplements.complementsOnlyBody( saveResponse.getBody() ));

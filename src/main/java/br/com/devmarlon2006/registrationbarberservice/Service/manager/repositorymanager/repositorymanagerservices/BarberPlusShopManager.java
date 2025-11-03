@@ -21,6 +21,7 @@ public class BarberPlusShopManager {
 
     public MesagerComplements<String> processBarberPlusShop(Barber barber , BarberShop barberShop) {
 
+
         MesagerComplements<String> Operation = barberRepositoryManagerService.postOnRepository( barber );
 
         if (Operation.getStatus() == ResponseStatus.ERROR)
@@ -31,11 +32,10 @@ public class BarberPlusShopManager {
         barber = barberRepositoryManagerService.fyndBarber( barber.getId() );
 
         if (barberRepositoryManagerService.existsBarber(barberShop)){
+            if (barber == null) {
+                return MesagerComplements.complementsComplete( ResponseStatus.ERROR, OperationStatusCode.ERROR_ENTITY_NOT_FOUND.getMessage());
+            }
             return MesagerComplements.complementsComplete( ResponseStatus.ERROR, OperationStatusCode.ERROR_UNIQUE_CONSTRAINT.getMessage() );
-        }
-
-        if (barber == null) {
-            return MesagerComplements.complementsComplete( ResponseStatus.ERROR, OperationStatusCode.ERROR_ENTITY_NOT_FOUND.getMessage());
         }
 
         try{

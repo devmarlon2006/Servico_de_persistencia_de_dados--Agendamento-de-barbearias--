@@ -5,6 +5,7 @@ import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.Message
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.ResponseStatus;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.OperationStatusCode;
 import br.com.devmarlon2006.registrationbarberservice.Service.connectionmodule.ConnectivityService;
+import br.com.devmarlon2006.registrationbarberservice.Service.manager.modelsassemblersmanagers.ClientAssembler;
 import br.com.devmarlon2006.registrationbarberservice.Service.manager.repositorymanager.repositorymanagerservices.ClientRepositoryManagerService;
 import br.com.devmarlon2006.registrationbarberservice.model.client.Client;
 import br.com.devmarlon2006.registrationbarberservice.model.client.clientdtos.ClientRegistrationDTO;
@@ -18,21 +19,17 @@ public class ClientService {
 
     private final ClientRepositoryManagerService managerClient;
     private final ConnectivityService test;
+    private final ClientAssembler clientAssembler;
 
-    public ClientService(ClientRepositoryManagerService managerClient, ConnectivityService test) {
+    public ClientService(ClientRepositoryManagerService managerClient, ConnectivityService test, ClientAssembler clientAssembler) {
         this.managerClient = managerClient;
         this.test = test;
+        this.clientAssembler = clientAssembler;
     }
 
     public MessageContainer<MesagerComplements<String>> ProcessClientRegistration(@NonNull ClientRegistrationDTO clientDTO) {
 
-        Client client = Client.buildFromRegistrationDTO( clientDTO );
-
-
-        if (client.getId() == null) {
-            client.generateId();
-        }
-
+        Client client = clientAssembler.clientAssembler( clientDTO ).getBody();
 
         try {
 

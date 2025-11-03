@@ -3,6 +3,7 @@ package br.com.devmarlon2006.registrationbarberservice.Controllers;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.MesagerComplements;
 import br.com.devmarlon2006.registrationbarberservice.Service.apimessage.MessageContainer;
 import br.com.devmarlon2006.registrationbarberservice.Service.applicationservices.BarberAppointmentService;
+import br.com.devmarlon2006.registrationbarberservice.model.barbershop.barbershopdtos.BarberShopRegistrationDTO;
 import br.com.devmarlon2006.registrationbarberservice.model.barbershop.barbershopdtos.BarberShopWithOwnerRegistrationDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public class BarberAndShopController {
     }
 
     @PostMapping("${api.entity's.barberAndShop}")
-    public ResponseEntity<?> controllerShop(BarberShopWithOwnerRegistrationDTO data) {
+    public ResponseEntity<?> controllerShop(BarberShopRegistrationDTO data) {
         MessageContainer<MesagerComplements<String>> registrationResponse;
 
         try{
